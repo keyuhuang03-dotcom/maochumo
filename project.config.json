@@ -1,0 +1,12 @@
+{
+  "description": "猫出没四人协作 Demo",
+  "miniprogramRoot": "dist/miniprogram/",
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "maochumo",
+  "setting": {
+    "es6": true,
+    "minified": true,
+    "urlCheck": true
+  }
+}

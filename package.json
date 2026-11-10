@@ -1,0 +1,37 @@
+{
+  "name": "maochumo",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24 <27"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "tsx watch server/src/index.ts",
+    "start": "node dist/server/server/src/index.js",
+    "typecheck": "tsc -p server/tsconfig.json --noEmit && tsc -p miniprogram/tsconfig.json --noEmit",
+    "build": "npm run build:server && npm run build:mini",
+    "build:server": "tsc -p server/tsconfig.json",
+    "build:mini": "node scripts/build-mini.mjs",
+    "db:migrate": "tsx server/scripts/migrate.ts",
+    "db:seed": "tsx server/seeds/demo.ts",
+    "test": "tsx --test server/tests/*.test.ts",
+    "test:page": "node scripts/test-page.mjs",
+    "check": "npm run typecheck && npm run build && npm test",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "format": "prettier --write \"server/**/*.ts\" \"miniprogram/**/*.ts\" \"contracts/*.{ts,json,md}\" \"scripts/*.mjs\" \"docs/*.md\" \"*.{json,md,yaml}\" \".github/**/*.yml\""
+  },
+  "dependencies": {
+    "dotenv": "17.2.3",
+    "fastify": "5.12.8",
+    "mysql2": "3.24.6"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "miniprogram-api-typings": "5.3.1",
+    "prettier": "3.6.2",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.local/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+coverage/
+project.private.config.json
+miniprogram/core/env.local.ts
+.codex/
+.agents/
+.vscode/
+.idea/

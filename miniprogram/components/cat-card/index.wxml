@@ -1,0 +1,1 @@
+<view class="card" bindtap="open" role="button" aria-label="查看猫咪档案"><view>{{cat.name}}</view><view class="muted">{{cat.appearance || '暂无外貌资料'}}</view><view class="muted">编号：{{cat.id}}</view></view>

@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "features/community/home/index",
+    "features/campus-map/index/index",
+    "features/community/publish/index",
+    "features/catalog/list/index",
+    "features/account/index/index",
+    "features/community/detail/index",
+    "features/community/search/index",
+    "features/community/hot/index",
+    "features/catalog/detail/index",
+    "features/account/settings/index",
+    "features/account/posts/index",
+    "features/account/likes/index",
+    "features/account/messages/index",
+    "features/account/login/index",
+    "features/admin/index/index",
+    "features/admin/cats/index",
+    "features/admin/areas/index",
+    "features/admin/topics/index",
+    "features/admin/posts/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "猫出没",
+    "navigationBarBackgroundColor": "#FAF8F4",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FAF8F4"
+  },
+  "tabBar": {
+    "color": "#625B53",
+    "selectedColor": "#81532F",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "features/community/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "features/campus-map/index/index",
+        "text": "地图"
+      },
+      {
+        "pagePath": "features/community/publish/index",
+        "text": "发布"
+      },
+      {
+        "pagePath": "features/catalog/list/index",
+        "text": "图鉴"
+      },
+      {
+        "pagePath": "features/account/index/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {
+    "post-card": "/components/post-card/index",
+    "cat-card": "/components/cat-card/index",
+    "view-state": "/components/view-state/index"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

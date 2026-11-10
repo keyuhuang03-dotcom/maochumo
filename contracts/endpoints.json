@@ -1,0 +1,1537 @@
+{
+  "version": "v1",
+  "basePath": "/api/v1",
+  "responseEnvelope": "ApiResult<T>",
+  "warning": "reserved/blocked成功样例仅契约，不是实现结果；非列表空数据不伪造成功。",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/wechat",
+      "owner": "负责人",
+      "status": "blocked",
+      "auth": "public",
+      "requestType": "{code:string}",
+      "responseType": "Session",
+      "notes": "实际返回503 WECHAT_NOT_CONFIGURED。token仅本地保存，禁止日志。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "token": "<opaque-token>",
+              "expiresAt": "2026-11-10T01:00:00.000Z",
+              "user": {
+                "id": "demo-member",
+                "nickname": "演示同学",
+                "avatarRef": null,
+                "role": "user"
+              },
+              "mode": "wechat"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 503,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "DEPENDENCY_NOT_CONFIGURED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/dev",
+      "owner": "负责人",
+      "status": "implemented",
+      "auth": "local-key",
+      "requestType": "{profile:'member'|'admin',key:string}",
+      "responseType": "Session",
+      "notes": "仅开发/回环/显式开关；默认404 NOT_FOUND，错误密钥403。",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "token": "<opaque-token>",
+              "expiresAt": "2026-11-10T01:00:00.000Z",
+              "user": {
+                "id": "demo-member",
+                "nickname": "演示同学",
+                "avatarRef": null,
+                "role": "user"
+              },
+              "mode": "development"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "owner": "B/负责人",
+      "status": "implemented",
+      "auth": "session",
+      "requestType": "none",
+      "responseType": "User",
+      "notes": "",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-member",
+              "nickname": "演示同学",
+              "avatarRef": null,
+              "role": "user"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/me",
+      "owner": "B",
+      "status": "reserved",
+      "auth": "session",
+      "requestType": "{nickname:string,avatarRef:string|null}",
+      "responseType": "User",
+      "notes": "不能更新role或wechat_identity；头像引用须核验归属。昵称限制待定。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-member",
+              "nickname": "演示同学",
+              "avatarRef": null,
+              "role": "user"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/posts",
+      "owner": "负责人",
+      "status": "implemented",
+      "auth": "public",
+      "requestType": "page?,pageSize?,q?,catId?,topicId?",
+      "responseType": "PageResult<Post>",
+      "notes": "page默认1，pageSize默认20，上限50；仅公开；正文/话题/猫名搜索；按createdAt/id降序。",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "demo-post-public",
+                  "body": "演示帖子",
+                  "author": {
+                    "id": "demo-member",
+                    "nickname": "演示同学",
+                    "avatarRef": null,
+                    "role": "user"
+                  },
+                  "images": [],
+                  "cats": [
+                    {
+                      "id": "demo-cat-1",
+                      "name": "橘子"
+                    }
+                  ],
+                  "topics": [
+                    {
+                      "id": "demo-topic",
+                      "name": "校园日常"
+                    }
+                  ],
+                  "likeCount": 0,
+                  "commentCount": 0,
+                  "liked": false,
+                  "createdAt": "2026-11-10T00:00:00.000Z"
+                }
+              ],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/posts/hot",
+      "owner": "负责人",
+      "status": "reserved",
+      "auth": "public",
+      "requestType": "none",
+      "responseType": "{items:Post[],asOf:string}",
+      "notes": "近七天[T-7d,T]；赞、评、时间、ID降序，最多10。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "demo-post-public",
+                  "body": "演示帖子",
+                  "author": {
+                    "id": "demo-member",
+                    "nickname": "演示同学",
+                    "avatarRef": null,
+                    "role": "user"
+                  },
+                  "images": [],
+                  "cats": [
+                    {
+                      "id": "demo-cat-1",
+                      "name": "橘子"
+                    }
+                  ],
+                  "topics": [
+                    {
+                      "id": "demo-topic",
+                      "name": "校园日常"
+                    }
+                  ],
+                  "likeCount": 0,
+                  "commentCount": 0,
+                  "liked": false,
+                  "createdAt": "2026-11-10T00:00:00.000Z"
+                }
+              ],
+              "asOf": "2026-11-10T00:00:00.000Z"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [],
+              "asOf": "2026-11-10T00:00:00.000Z"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/posts/:postId",
+      "owner": "负责人",
+      "status": "implemented",
+      "auth": "public",
+      "requestType": "postId",
+      "responseType": "Post",
+      "notes": "隐藏、删除、不存在统一404。",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-post-public",
+              "body": "演示帖子",
+              "author": {
+                "id": "demo-member",
+                "nickname": "演示同学",
+                "avatarRef": null,
+                "role": "user"
+              },
+              "images": [],
+              "cats": [
+                {
+                  "id": "demo-cat-1",
+                  "name": "橘子"
+                }
+              ],
+              "topics": [
+                {
+                  "id": "demo-topic",
+                  "name": "校园日常"
+                }
+              ],
+              "likeCount": 0,
+              "commentCount": 0,
+              "liked": false,
+              "createdAt": "2026-11-10T00:00:00.000Z"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/posts",
+      "owner": "负责人",
+      "status": "reserved",
+      "auth": "session",
+      "requestType": "CreatePost",
+      "responseType": "Post",
+      "notes": "正文/图片至少一项；2000 code points/9图；requestKey保留到结果确定；同key不同payload为409。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-post-public",
+              "body": "演示帖子",
+              "author": {
+                "id": "demo-member",
+                "nickname": "演示同学",
+                "avatarRef": null,
+                "role": "user"
+              },
+              "images": [],
+              "cats": [
+                {
+                  "id": "demo-cat-1",
+                  "name": "橘子"
+                }
+              ],
+              "topics": [
+                {
+                  "id": "demo-topic",
+                  "name": "校园日常"
+                }
+              ],
+              "likeCount": 0,
+              "commentCount": 0,
+              "liked": false,
+              "createdAt": "2026-11-10T00:00:00.000Z"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/posts/:postId",
+      "owner": "负责人",
+      "status": "implemented",
+      "auth": "owner",
+      "requestType": "postId",
+      "responseType": "{id:ID,status:deleted}",
+      "notes": "重复删除成功；他人403；隐藏帖作者操作范围未定409。",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-post-public",
+              "status": "deleted"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/posts/:postId/like",
+      "owner": "负责人",
+      "status": "implemented",
+      "auth": "session",
+      "requestType": "{liked:boolean}",
+      "responseType": "{liked:boolean,likeCount:number}",
+      "notes": "设置目标状态，不是toggle；重复和并发不重复计数。",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "liked": true,
+              "likeCount": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/posts/:postId/comments",
+      "owner": "负责人",
+      "status": "reserved",
+      "auth": "public",
+      "requestType": "postId,page?,pageSize?",
+      "responseType": "PageResult<Comment>",
+      "notes": "",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "sample-comment",
+                  "postId": "demo-post-public",
+                  "author": {
+                    "id": "demo-member",
+                    "nickname": "演示同学",
+                    "avatarRef": null,
+                    "role": "user"
+                  },
+                  "body": "契约样例，尚未实现",
+                  "replyToId": null,
+                  "createdAt": "2026-11-10T00:00:00.000Z"
+                }
+              ],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/posts/:postId/comments",
+      "owner": "负责人",
+      "status": "reserved",
+      "auth": "session",
+      "requestType": "CreateComment",
+      "responseType": "Comment",
+      "notes": "同帖回复检查、幂等、评论与通知同事务；通知细则待确认。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "sample-comment",
+              "postId": "demo-post-public",
+              "author": {
+                "id": "demo-member",
+                "nickname": "演示同学",
+                "avatarRef": null,
+                "role": "user"
+              },
+              "body": "契约样例，尚未实现",
+              "replyToId": null,
+              "createdAt": "2026-11-10T00:00:00.000Z"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/areas",
+      "owner": "负责人/A",
+      "status": "implemented",
+      "auth": "public",
+      "requestType": "none",
+      "responseType": "{items:Area[]}",
+      "notes": "",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "demo-area-library",
+                  "name": "示例图书馆",
+                  "region": {
+                    "x": 0.1,
+                    "y": 0.2,
+                    "width": 0.22,
+                    "height": 0.3
+                  },
+                  "version": 1
+                }
+              ]
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": []
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/cats",
+      "owner": "A",
+      "status": "implemented",
+      "auth": "public",
+      "requestType": "page?,pageSize?,q?,areaId?",
+      "responseType": "PageResult<Cat>",
+      "notes": "名字/别名和区域组合；重名不同ID；按ID稳定分页。",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "demo-cat-1",
+                  "name": "橘子",
+                  "areaId": "demo-area-library",
+                  "aliases": ["小橘"],
+                  "photoRefs": [],
+                  "sex": "unknown",
+                  "appearance": "演示档案",
+                  "personality": null,
+                  "version": 1
+                }
+              ],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/cats/:catId",
+      "owner": "A",
+      "status": "implemented",
+      "auth": "public",
+      "requestType": "catId",
+      "responseType": "Cat",
+      "notes": "",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-cat-1",
+              "name": "橘子",
+              "areaId": "demo-area-library",
+              "aliases": ["小橘"],
+              "photoRefs": [],
+              "sex": "unknown",
+              "appearance": "演示档案",
+              "personality": null,
+              "version": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/topics",
+      "owner": "负责人/C",
+      "status": "implemented",
+      "auth": "public",
+      "requestType": "none",
+      "responseType": "{items:(Ref & {version:number})[]}",
+      "notes": "只列active。历史展示策略待定。",
+      "examples": {
+        "success": {
+          "kind": "runtime-shape",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "demo-topic",
+                  "name": "校园日常",
+                  "version": 1
+                }
+              ]
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": []
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 400,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "VALIDATION_ERROR",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/posts",
+      "owner": "B",
+      "status": "reserved",
+      "auth": "session",
+      "requestType": "page?,pageSize?",
+      "responseType": "PageResult<Post>",
+      "notes": "用户范围由服务端会话确定；不接受userId。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "demo-post-public",
+                  "body": "演示帖子",
+                  "author": {
+                    "id": "demo-member",
+                    "nickname": "演示同学",
+                    "avatarRef": null,
+                    "role": "user"
+                  },
+                  "images": [],
+                  "cats": [
+                    {
+                      "id": "demo-cat-1",
+                      "name": "橘子"
+                    }
+                  ],
+                  "topics": [
+                    {
+                      "id": "demo-topic",
+                      "name": "校园日常"
+                    }
+                  ],
+                  "likeCount": 0,
+                  "commentCount": 0,
+                  "liked": false,
+                  "createdAt": "2026-11-10T00:00:00.000Z"
+                }
+              ],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/likes",
+      "owner": "B",
+      "status": "reserved",
+      "auth": "session",
+      "requestType": "page?,pageSize?",
+      "responseType": "PageResult<Post>",
+      "notes": "用户范围由服务端会话确定；不接受userId。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "demo-post-public",
+                  "body": "演示帖子",
+                  "author": {
+                    "id": "demo-member",
+                    "nickname": "演示同学",
+                    "avatarRef": null,
+                    "role": "user"
+                  },
+                  "images": [],
+                  "cats": [
+                    {
+                      "id": "demo-cat-1",
+                      "name": "橘子"
+                    }
+                  ],
+                  "topics": [
+                    {
+                      "id": "demo-topic",
+                      "name": "校园日常"
+                    }
+                  ],
+                  "likeCount": 0,
+                  "commentCount": 0,
+                  "liked": false,
+                  "createdAt": "2026-11-10T00:00:00.000Z"
+                }
+              ],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/notifications",
+      "owner": "B",
+      "status": "reserved",
+      "auth": "session",
+      "requestType": "page?,pageSize?",
+      "responseType": "PageResult<Notification>",
+      "notes": "不可返回隐藏/删除正文；targetAvailable由公开可见性判断。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [
+                {
+                  "id": "sample-notification",
+                  "postId": "demo-post-public",
+                  "commentId": "sample-comment",
+                  "type": "comment",
+                  "readAt": null,
+                  "createdAt": "2026-11-10T00:00:00.000Z",
+                  "targetAvailable": true
+                }
+              ],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "items": [],
+              "page": 1,
+              "pageSize": 20,
+              "hasMore": false
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/notifications/unread-count",
+      "owner": "B",
+      "status": "reserved",
+      "auth": "session",
+      "requestType": "none",
+      "responseType": "{count:number}",
+      "notes": "",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "count": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/me/notifications/:notificationId/read",
+      "owner": "B",
+      "status": "reserved",
+      "auth": "recipient",
+      "requestType": "notificationId",
+      "responseType": "{id:ID,readAt:string}",
+      "notes": "COALESCE只设置首次时间；WHERE recipient_id=currentUser。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "sample-notification",
+              "readAt": "2026-11-10T00:00:00.000Z"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/me/notifications/read-all",
+      "owner": "B",
+      "status": "reserved",
+      "auth": "session",
+      "requestType": "none",
+      "responseType": "{unreadCount:number}",
+      "notes": "显式操作，不在进入列表时调用。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "unreadCount": 0
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/cats",
+      "owner": "C",
+      "status": "reserved",
+      "auth": "admin",
+      "requestType": "CreateCat",
+      "responseType": "Cat",
+      "notes": "创建由服务端生成稳定ID；requestKey必需；资料与日志同事务。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-cat-1",
+              "name": "橘子",
+              "areaId": "demo-area-library",
+              "aliases": ["小橘"],
+              "photoRefs": [],
+              "sex": "unknown",
+              "appearance": "演示档案",
+              "personality": null,
+              "version": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/cats/:id",
+      "owner": "C",
+      "status": "reserved",
+      "auth": "admin",
+      "requestType": "UpdateCat",
+      "responseType": "Cat",
+      "notes": "version并发控制；requestKey去重；同key异payload返回409。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-cat-1",
+              "name": "橘子",
+              "areaId": "demo-area-library",
+              "aliases": ["小橘"],
+              "photoRefs": [],
+              "sex": "unknown",
+              "appearance": "演示档案",
+              "personality": null,
+              "version": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/areas",
+      "owner": "C",
+      "status": "reserved",
+      "auth": "admin",
+      "requestType": "CreateArea",
+      "responseType": "Area",
+      "notes": "创建由服务端生成稳定ID；requestKey必需；资料与日志同事务。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-area-library",
+              "name": "示例图书馆",
+              "region": {
+                "x": 0.1,
+                "y": 0.2,
+                "width": 0.22,
+                "height": 0.3
+              },
+              "version": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/areas/:id",
+      "owner": "C",
+      "status": "reserved",
+      "auth": "admin",
+      "requestType": "UpdateArea",
+      "responseType": "Area",
+      "notes": "version并发控制；requestKey去重；同key异payload返回409。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-area-library",
+              "name": "示例图书馆",
+              "region": {
+                "x": 0.1,
+                "y": 0.2,
+                "width": 0.22,
+                "height": 0.3
+              },
+              "version": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/topics",
+      "owner": "C",
+      "status": "reserved",
+      "auth": "admin",
+      "requestType": "CreateTopic",
+      "responseType": "Topic",
+      "notes": "创建由服务端生成稳定ID；requestKey必需；资料与日志同事务。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "sample-topic",
+              "name": "示例话题",
+              "status": "active",
+              "version": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/topics/:id",
+      "owner": "C",
+      "status": "reserved",
+      "auth": "admin",
+      "requestType": "UpdateTopic",
+      "responseType": "Topic",
+      "notes": "version并发控制；requestKey去重；同key异payload返回409。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "sample-topic",
+              "name": "示例话题",
+              "status": "active",
+              "version": 1
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/posts/:postId/hide",
+      "owner": "C",
+      "status": "reserved",
+      "auth": "admin",
+      "requestType": "HidePost",
+      "responseType": "{id:ID,status:hidden}",
+      "notes": "角色、状态、行锁、幂等及日志同事务；无恢复接口。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "id": "demo-post-public",
+              "status": "hidden"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 501,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "NOT_IMPLEMENTED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/uploads",
+      "owner": "负责人",
+      "status": "blocked",
+      "auth": "session",
+      "requestType": "UploadIntent",
+      "responseType": "UploadResult",
+      "notes": "当前仅接入边界，实际503 UPLOAD_NOT_CONFIGURED；真正上传字节协议随存储方案确定。",
+      "examples": {
+        "success": {
+          "kind": "contract-only-not-implemented",
+          "httpStatus": 200,
+          "body": {
+            "ok": true,
+            "data": {
+              "imageRef": "<verified-asset-id>",
+              "url": "<approved-media-url>"
+            },
+            "requestId": "sample-request"
+          }
+        },
+        "empty": {
+          "applicable": false,
+          "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
+        },
+        "error": {
+          "httpStatus": 503,
+          "body": {
+            "ok": false,
+            "error": {
+              "code": "DEPENDENCY_NOT_CONFIGURED",
+              "message": "示例错误，详见具体接口"
+            },
+            "requestId": "sample-request"
+          }
+        }
+      }
+    }
+  ]
+}

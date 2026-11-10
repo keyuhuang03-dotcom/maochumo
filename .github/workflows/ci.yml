@@ -1,0 +1,39 @@
+name: verify
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: maochumo_demo
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      NODE_ENV: development
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ""
+      DB_NAME: maochumo_demo
+      DEV_AUTH_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.22.2"
+          cache: npm
+      - run: npm ci
+      - run: npm run db:migrate && npm run db:migrate
+      - run: npm run db:seed && npm run db:seed
+      - run: npm run check
+      - run: |
+          npm start > /tmp/maochumo-api.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/health && break; sleep 1; done
+          npm run test:page

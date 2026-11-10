@@ -1,0 +1,1 @@
+<view class="notice" wx:if="{{state === 'loading'}}" aria-live="polite">正在加载…</view><view class="notice" wx:elif="{{state === 'empty'}}">{{message || '暂无资料'}}</view><view wx:elif="{{state === 'error'}}"><view class="notice">{{message || '加载失败，请重试'}}</view><button bindtap="retry">重新加载</button></view>

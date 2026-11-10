@@ -1,0 +1,1 @@
+<view class="page"><view class="title">帖子详情</view><view-state state="{{state}}" message="{{message}}" bind:retry="load"/><post-card wx:if="{{post}}" post="{{post}}"/><button wx:for="{{post.cats}}" wx:key="id" bindtap="cat" data-id="{{item.id}}">查看 {{item.name}} 档案</button><view class="notice">点赞、评论与消息定位界面待项目负责人接入。</view><button bindtap="back">返回</button></view>
