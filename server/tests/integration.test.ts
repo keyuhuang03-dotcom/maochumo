@@ -8,6 +8,12 @@ import { db, rows, transaction } from "../src/common/db";
 import { assertReplyTarget } from "../src/modules/interactions/guards";
 import { tokenHash } from "../src/common/auth";
 const app = buildApp();
+test("database sessions use UTC for created_at defaults", async () => {
+  const [row] = await rows<{ zone: string }>(
+    "SELECT @@session.time_zone AS zone",
+  );
+  assert.equal(row.zone, "+00:00");
+});
 const member = randomBytes(32).toString("hex");
 const admin = randomBytes(32).toString("hex");
 const id = "test-" + randomUUID();
