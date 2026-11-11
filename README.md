@@ -1,8 +1,8 @@
 # 猫出没
 
-原生微信小程序 + TypeScript / Fastify / MySQL 的四人协作 Demo 工程。当前版本是开发基础，不是完整业务成品。
+原生微信小程序 + TypeScript / Fastify / MySQL 的四人协作 Demo 工程。负责人负责的帖子、地图及公共能力已完成本地 Demo 实现；A/B/C 模块仍待成员交付，尚非完整成品。
 
-已实现：首页与详情真实数据查询、示意地图区域查询、统一请求与错误、服务端会话校验、开发登录边界、点赞目标状态接口、作者删除接口。19 个页面和五个底部入口已注册；A/B/C 业务页面是明确标识的占位。
+已实现：首页与详情、搜索热帖、图文发布、多猫/话题可选关联、点赞、评论回复、通知生成、本人删除，以及演示地图选区/猫列表分页。发布与评论支持超时重试防重，失败保留草稿；图片使用真实本地上传。19 页、五入口保留，A/B/C 页面仍为明确占位。
 
 ## 快速启动
 
@@ -16,7 +16,7 @@ npm run db:up
 npm run db:migrate
 npm run db:seed
 npm run build
-npm run dev
+npm run start:demo  # 本机开发身份 + 本地真实图片存储
 ```
 
 `setup` 只在 .env 不存在时生成随机本地密码，不打印密钥。没有 Docker 时，手动建 `maochumo_demo` 空库及专用账号，修改 .env 的 DB\_\* 后从迁移继续。不要将已有业务库当演示库。
@@ -26,7 +26,9 @@ npm run dev
 ```sh
 npm run check       # 类型、构建、真实 MySQL 集成测试；先迁移、种子
 npm run test:page   # 另开终端，服务端运行时验证实际页面 JS → HTTP → MySQL
-npm start          # 运行已构建服务端，与 dev 二选一
+npm run test:owner-pages # start:demo 运行时验证发布/评论丢响应重试等
+npm run dev        # 普通开发模式，按 .env 配置；与 start:demo 二选一
+npm run debug:server # 本机 9229 调试端口，与其它服务启动命令二选一
 ```
 
 ## 协作入口
@@ -36,6 +38,8 @@ npm start          # 运行已构建服务端，与 dev 二选一
 - [决策及待确认项](docs/DECISIONS.md)、[接口契约](contracts/README.md)
 - [演示种子](docs/SEEDS.md)、[实际验证记录](docs/VALIDATION.md)
 
-真实微信登录及图片存储尚未接入，分别返回 503。其它预留业务接口返回 501；不能把契约中的未来成功样例当作已实现结果。
+微信登录适配器已实现，缺少 AppID/AppSecret 时仍返回 503；平台真实登录尚未验收。start:demo 只启用本机开发身份和本地图片存储，不开通云资源。B 的个人/消息接口、C 的管理写接口仍返回 501。图片不会随 Git 提交；正式存储和 HTTPS 域名待配置。
+
+仓库为公开仓库，成员可直接查看/克隆；直接推送仍需协作者权限。操作步骤见 [负责人演示与交接](docs/OWNER-DEMO.md)。
 
 main 保持可运行。成员创建 feat/catalog、feat/account、feat/admin 等功能分支，小批量 PR，D2 首版合并、D5 全量合并、D6—D7 测试演示。尚未邀请协作者，待提供三位成员 GitHub 用户名。

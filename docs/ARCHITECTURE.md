@@ -21,11 +21,11 @@ uploads 是 P1/P2/P5 共用的存储边界，common 放数据库、权限、响�
 - post_cats / post_topics：复合主键，关联可为零，不通过名字推断猫；猫名非唯一。
 - cats：稳定字符串 ID，一条非空 area_id 外键；aliases/photo_refs 为 JSON 数组，version 用于未来并发修改。
 - areas：归一化矩形范围 x/y/width/height，非 GPS；真实边界待核对。
-- assets / post_images：上传归属与用途；图片顺序 0—8，业务还须验证总数与 ready。
+- assets / post_images：真实上传验证内容并重编码，图片顺序0—8；发布检查归属、post用途和ready。GET /media/:id 每次检查公开引用，不缓存；仅未关联草稿图片可由上传者鉴权读取，隐藏/删除关联不通过作者身份绕过公开限制。
 - likes：user_id/post_id 联合主键；事务锁定帖子后设置目标状态，重复不累计。
 - comments：同帖回复校验函数在 interactions/guards.ts，未来写接口必须在同一个事务里调用；author_id/request_key 唯一。
 - notifications：recipient_id/comment_id 唯一；read_at 是可空时间；未来已读 UPDATE 必须带 recipient_id，COALESCE(read_at, UTC_TIMESTAMP(3))，不能用客户端传入接收者或自增减未读计数。
-- admin_logs + idempotency_keys：未来管理变更与日志、幂等响应必须同事务。幂等键范围 actor + scope + key；同 key 不同 request_hash 返回 409，相同返回原结果。表已建，通用幂等业务执行器尚未实现。
+- admin_logs + idempotency_keys：未来管理变更与日志、幂等响应必须同事务。幂等键范围 actor + scope + key；同 key 不同 request_hash 返回 409，相同返回原结果。common/idempotency.ts 的 once 已用于发布和评论：先锁定操作者行，再按统一顺序锁业务资源，检查 payload hash，事务保存结果。C 可复用执行器实现管理写入。
 
 ## 一致性
 
@@ -33,7 +33,7 @@ uploads 是 P1/P2/P5 共用的存储边界，common 放数据库、权限、响�
 
 点赞与删除共用帖子行锁，避免点赞成功时帖子已被并发删除。计数实时聚合，不维护易失真的冗余数字。后续管理员隐藏也必须锁同一行。已有授权头时列表会校验 session 并返回真实 liked 状态。
 
-未来发布在同事务校验引用并保存主帖/图片/关联/幂等结果；未来评论在同事务检查公开状态、回复目标、保存评论及通知。通知规则未确认前接口保持 501。资料更新用 WHERE id=? AND version=?，不匹配返回 409。
+发布已在同事务校验引用并保存主帖/图片/关联/幂等结果；评论已在同事务检查公开状态、回复目标、保存评论及通知。通知按用户确定的双接收者规则去重并排除自己。资料更新用 WHERE id=? AND version=?，不匹配返回 409。
 
 ## 安全与异常
 

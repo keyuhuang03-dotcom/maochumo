@@ -78,10 +78,11 @@ export interface Notification {
   createdAt: string;
   targetAvailable: boolean;
 }
-export interface UploadIntent {
-  purpose: "post" | "avatar" | "cat";
-  contentType: string;
-  size: number;
+export type UploadPurpose = "post" | "avatar" | "cat";
+/** Multipart field file contains bytes; purpose is a query parameter. */
+export interface UploadRequest {
+  purpose: UploadPurpose;
+  filePath: string;
 }
 export interface UploadResult {
   imageRef: string;

@@ -23,7 +23,7 @@ export function request<T>(
       data,
       timeout: 10000,
       header: {
-        "content-type": "application/json",
+        ...(data !== undefined ? { "content-type": "application/json" } : {}),
         ...(token ? { Authorization: "Bearer " + token } : {}),
       },
       success(response) {

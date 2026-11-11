@@ -1,1 +1,7 @@
-<view class="card" bindtap="open" role="button" aria-label="查看帖子详情"><view>{{post.author.nickname || '校园同学'}}</view><view style="margin:16rpx 0;white-space:pre-wrap">{{post.body}}</view><view class="muted">{{post.likeCount}} 赞 · {{post.commentCount}} 评论</view><view class="muted" wx:if="{{post.cats.length}}">关联猫咪：<text wx:for="{{post.cats}}" wx:key="id">{{item.name}} </text></view></view>
+<view class="card" bindtap="open" role="button" aria-label="查看帖子详情">
+ <view class="author">{{post.author.nickname || '校园同学'}}</view>
+ <view class="post-body">{{post.body}}</view>
+ <view class="photos"><image wx:for="{{post.images}}" wx:key="*this" src="{{item}}" mode="aspectFill" data-url="{{item}}" catchtap="preview" class="photo" /></view>
+ <view class="tags"><button wx:for="{{post.topics}}" wx:key="id" size="mini" data-id="{{item.id}}" catchtap="topic">#{{item.name}}</button><button wx:for="{{post.cats}}" wx:key="id" size="mini" data-id="{{item.id}}" catchtap="cat">{{item.name}} · 档案</button></view>
+ <view class="muted">{{post.likeCount}} 赞 · {{post.commentCount}} 评论</view>
+</view>

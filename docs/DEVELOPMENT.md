@@ -48,9 +48,17 @@ export const env = { apiBase: "http://127.0.0.1:3000", development: true };
 
 开发登录默认 false。仅本地需要时在 .env 设置 DEV_AUTH_ENABLED=true，保持 NODE_ENV=development 和 HOST=127.0.0.1；从本地 .env 读取开发密钥，在“我的→登录→开发身份登录”手动输入，不要提交或发到聊天。服务端只允许 member/admin 两个种子 profile，真实业务角色从库读，客户端不能任意提交 userId 或 role。开发登录只发 1 小时随机会话，库内只存 token SHA-256；生产启用开发登录直接拒绝启动。
 
-小程序开发页面仅提供 member 登录。管理员联调可本地调用 /auth/dev 的 admin profile；密钥通过本地环境读取，不写在 shell 命令或日志里。此通道不代表真实微信登录通过。真实微信适配应由服务端交换 code、保存平台绑定、发放业务 token；失败不能回退开发身份。
+小程序开发页面仅提供 member 登录。管理员联调可本地调用 /auth/dev 的 admin profile；密钥通过本地环境读取，不写在 shell 命令或日志里。此通道不代表真实微信登录通过。真实微信适配已由服务端交换 code、保存平台绑定、发放业务 token；失败不能回退开发身份。
 
-上传暂时禁用：prepareUpload → POST /uploads 返回明确 503，不返回虚假 imageRef。后续适配必须验证格式/文件内容、大小、用途、上传者、资源 ready 状态，避免任意 URL 注入。头像、猫图、帖子图共用 assets 记录；未引用清理策略待定。
+本地上传已实现：`uploadImage(filePath, purpose)` → `POST /api/v1/uploads?purpose=post|avatar|cat`，multipart 字段固定 `file`。使用 `npm run start:demo` 显式启用本机开发身份与本地存储；或在 .env 设置 UPLOAD_DRIVER=local（仅development/回环地址允许）。默认 disabled 仍返回503。文件存于 UPLOAD_DIR（默认.local/uploads），不提交仓库。PUBLIC_API_BASE 是可信图片链接前缀，改 API 端口时须同步调整。
+
+服务端解码并重编码图片，验证大小、像素及静态格式；去除原有元数据，拒绝伪造图片/任意路径。返回 imageRef 供提交，url 供公开展示。未关联图片只有上传者可鉴权读取；已关联图片按公开引用判断，隐藏/删除后不公开。云存储适配尚未提供，未引用清理策略待确认。
+
+微信适配已实现 code→微信固定域名→openid→用户绑定→业务会话，不把 session_key/openid 发给客户端。缺少配置、平台错误均明确失败，不自动降级开发身份。真实平台仍未验收，测试中的注入身份只验证应用适配逻辑。
+
+`npm run test:owner-pages` 需要先启动 start:demo 或 UPLOAD_DRIVER=local 的服务。它会创建和清理自己的测试用户/帖子/图片，不使用成员数据。测试保留不确定结果的原请求标识并模拟成功响应丢失；不会把平台传输适配当成真机渲染。
+
+`npm run debug:server` 使用本机 9229 inspector，VS Code/Chrome 可附加调试；与其它启动命令二选一，避免占用同一端口。普通 `npm run dev` 仍按 .env 工作，不默认启用开发登录。
 
 ## 调试及错误
 

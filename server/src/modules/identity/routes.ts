@@ -1,18 +1,61 @@
-import { randomBytes, timingSafeEqual } from "node:crypto";
+import { randomBytes, timingSafeEqual, randomUUID } from "node:crypto";
 import { FastifyInstance } from "fastify";
 import { config } from "../../config";
-import { db, rows } from "../../common/db";
+import { db, rows, transaction } from "../../common/db";
 import { identity, tokenHash } from "../../common/auth";
 import { ApiError, ok, pending } from "../../common/http";
 import { User } from "../../../../contracts";
+import { wechat } from "./wechat";
 export async function identityRoutes(app: FastifyInstance) {
-  app.post("/api/v1/auth/wechat", async () => {
-    throw new ApiError(
-      503,
-      "WECHAT_NOT_CONFIGURED",
-      "真实微信登录适配器尚未接入",
-    );
-  });
+  app.post<{ Body: { code: string } }>(
+    "/api/v1/auth/wechat",
+    {
+      schema: {
+        body: {
+          type: "object",
+          additionalProperties: false,
+          required: ["code"],
+          properties: {
+            code: { type: "string", minLength: 1, maxLength: 256 },
+          },
+        },
+      },
+    },
+    async (r) => {
+      const platformId = await wechat.exchange(r.body.code);
+      const token = randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 7 * 86400000);
+      const user = await transaction(async (c) => {
+        await c.execute(
+          "INSERT INTO users(id,wechat_identity,role) VALUES(?,?,'user') ON DUPLICATE KEY UPDATE id=id",
+          [randomUUID(), platformId],
+        );
+        const [u] = await rows<User & { status: string }>(
+          "SELECT id,nickname,avatar_ref AS avatarRef,role,status FROM users WHERE wechat_identity=? FOR UPDATE",
+          [platformId],
+          c,
+        );
+        if (u.status !== "active")
+          throw new ApiError(403, "ACCOUNT_DISABLED", "账号已停用");
+        await c.execute(
+          "INSERT INTO sessions(token_hash,user_id,expires_at) VALUES(?,?,?)",
+          [tokenHash(token), u.id, expiresAt],
+        );
+        return {
+          id: u.id,
+          nickname: u.nickname,
+          avatarRef: u.avatarRef,
+          role: u.role,
+        };
+      });
+      return ok(r, {
+        token,
+        expiresAt: expiresAt.toISOString(),
+        user,
+        mode: "wechat",
+      });
+    },
+  );
   app.post<{ Body: { profile: "member" | "admin"; key: string } }>(
     "/api/v1/auth/dev",
     {

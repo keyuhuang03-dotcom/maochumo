@@ -1,5 +1,5 @@
 {
-  "version": "v1",
+  "version": "v1-owner-20261111",
   "basePath": "/api/v1",
   "responseEnvelope": "ApiResult<T>",
   "warning": "reserved/blocked成功样例仅契约，不是实现结果；非列表空数据不伪造成功。",
@@ -8,14 +8,14 @@
       "method": "POST",
       "path": "/api/v1/auth/wechat",
       "owner": "负责人",
-      "status": "blocked",
+      "status": "implemented",
       "auth": "public",
       "requestType": "{code:string}",
       "responseType": "Session",
-      "notes": "实际返回503 WECHAT_NOT_CONFIGURED。token仅本地保存，禁止日志。",
+      "notes": "真实交换适配器已实现；无配置503。应用逻辑注入测试通过，真实微信平台未验证。",
       "examples": {
         "success": {
-          "kind": "contract-only-not-implemented",
+          "kind": "runtime-shape",
           "httpStatus": 200,
           "body": {
             "ok": true,
@@ -38,17 +38,18 @@
           "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
         },
         "error": {
-          "httpStatus": 503,
+          "httpStatus": 400,
           "body": {
             "ok": false,
             "error": {
-              "code": "DEPENDENCY_NOT_CONFIGURED",
-              "message": "示例错误，详见具体接口"
+              "code": "VALIDATION_ERROR",
+              "message": "参数无效"
             },
             "requestId": "sample-request"
           }
         }
-      }
+      },
+      "validation": "adapter-tested-platform-pending"
     },
     {
       "method": "POST",
@@ -249,7 +250,7 @@
             "ok": false,
             "error": {
               "code": "VALIDATION_ERROR",
-              "message": "示例错误，详见具体接口"
+              "message": "参数无效"
             },
             "requestId": "sample-request"
           }
@@ -260,14 +261,14 @@
       "method": "GET",
       "path": "/api/v1/posts/hot",
       "owner": "负责人",
-      "status": "reserved",
+      "status": "implemented",
       "auth": "public",
       "requestType": "none",
       "responseType": "{items:Post[],asOf:string}",
       "notes": "近七天[T-7d,T]；赞、评、时间、ID降序，最多10。",
       "examples": {
         "success": {
-          "kind": "contract-only-not-implemented",
+          "kind": "runtime-shape",
           "httpStatus": 200,
           "body": {
             "ok": true,
@@ -318,12 +319,12 @@
           }
         },
         "error": {
-          "httpStatus": 501,
+          "httpStatus": 400,
           "body": {
             "ok": false,
             "error": {
-              "code": "NOT_IMPLEMENTED",
-              "message": "示例错误，详见具体接口"
+              "code": "VALIDATION_ERROR",
+              "message": "参数无效"
             },
             "requestId": "sample-request"
           }
@@ -396,14 +397,14 @@
       "method": "POST",
       "path": "/api/v1/posts",
       "owner": "负责人",
-      "status": "reserved",
+      "status": "implemented",
       "auth": "session",
       "requestType": "CreatePost",
       "responseType": "Post",
-      "notes": "正文/图片至少一项；2000 code points/9图；requestKey保留到结果确定；同key不同payload为409。",
+      "notes": "已实现事务与重试；2000 code points/9图；ID关联验证；图片须属于本人且为post/ready；同key不同payload409。",
       "examples": {
         "success": {
-          "kind": "contract-only-not-implemented",
+          "kind": "runtime-shape",
           "httpStatus": 200,
           "body": {
             "ok": true,
@@ -442,12 +443,12 @@
           "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
         },
         "error": {
-          "httpStatus": 501,
+          "httpStatus": 400,
           "body": {
             "ok": false,
             "error": {
-              "code": "NOT_IMPLEMENTED",
-              "message": "示例错误，详见具体接口"
+              "code": "VALIDATION_ERROR",
+              "message": "参数无效"
             },
             "requestId": "sample-request"
           }
@@ -536,14 +537,14 @@
       "method": "GET",
       "path": "/api/v1/posts/:postId/comments",
       "owner": "负责人",
-      "status": "reserved",
+      "status": "implemented",
       "auth": "public",
       "requestType": "postId,page?,pageSize?",
       "responseType": "PageResult<Comment>",
-      "notes": "",
+      "notes": "公开帖子内分页/同帖回复；评论1—2000 code points；发帖人+被回复人去重且排除自己；通知与评论同事务。GET可带focusId定位正确页。",
       "examples": {
         "success": {
-          "kind": "contract-only-not-implemented",
+          "kind": "runtime-shape",
           "httpStatus": 200,
           "body": {
             "ok": true,
@@ -584,12 +585,12 @@
           }
         },
         "error": {
-          "httpStatus": 501,
+          "httpStatus": 400,
           "body": {
             "ok": false,
             "error": {
-              "code": "NOT_IMPLEMENTED",
-              "message": "示例错误，详见具体接口"
+              "code": "VALIDATION_ERROR",
+              "message": "参数无效"
             },
             "requestId": "sample-request"
           }
@@ -600,14 +601,14 @@
       "method": "POST",
       "path": "/api/v1/posts/:postId/comments",
       "owner": "负责人",
-      "status": "reserved",
+      "status": "implemented",
       "auth": "session",
       "requestType": "CreateComment",
       "responseType": "Comment",
-      "notes": "同帖回复检查、幂等、评论与通知同事务；通知细则待确认。",
+      "notes": "公开帖子内分页/同帖回复；评论1—2000 code points；发帖人+被回复人去重且排除自己；通知与评论同事务。GET可带focusId定位正确页。",
       "examples": {
         "success": {
-          "kind": "contract-only-not-implemented",
+          "kind": "runtime-shape",
           "httpStatus": 200,
           "body": {
             "ok": true,
@@ -632,12 +633,12 @@
           "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
         },
         "error": {
-          "httpStatus": 501,
+          "httpStatus": 400,
           "body": {
             "ok": false,
             "error": {
-              "code": "NOT_IMPLEMENTED",
-              "message": "示例错误，详见具体接口"
+              "code": "VALIDATION_ERROR",
+              "message": "参数无效"
             },
             "requestId": "sample-request"
           }
@@ -1498,14 +1499,14 @@
       "method": "POST",
       "path": "/api/v1/uploads",
       "owner": "负责人",
-      "status": "blocked",
+      "status": "implemented",
       "auth": "session",
-      "requestType": "UploadIntent",
+      "requestType": "multipart file + query purpose=post|avatar|cat",
       "responseType": "UploadResult",
-      "notes": "当前仅接入边界，实际503 UPLOAD_NOT_CONFIGURED；真正上传字节协议随存储方案确定。",
+      "notes": "实际本地图片IO；默认disabled返回503；start:demo启用。静态JPEG/PNG/WebP，8MB/2000万像素；重编码PNG长边2048。云存储未实现。",
       "examples": {
         "success": {
-          "kind": "contract-only-not-implemented",
+          "kind": "runtime-shape",
           "httpStatus": 200,
           "body": {
             "ok": true,
@@ -1521,17 +1522,25 @@
           "reason": "非列表接口没有空集合成功；资源不存在为404、无效写入为400"
         },
         "error": {
-          "httpStatus": 503,
+          "httpStatus": 400,
           "body": {
             "ok": false,
             "error": {
-              "code": "DEPENDENCY_NOT_CONFIGURED",
-              "message": "示例错误，详见具体接口"
+              "code": "VALIDATION_ERROR",
+              "message": "参数无效"
             },
             "requestId": "sample-request"
           }
         }
-      }
+      },
+      "validation": "local-real-io-tested"
     }
-  ]
+  ],
+  "media": {
+    "method": "GET",
+    "path": "/api/v1/media/:id",
+    "status": "implemented",
+    "response": "image/png; Cache-Control:no-store",
+    "rules": "仅公开引用或上传者未关联草稿可读；否则404。"
+  }
 }

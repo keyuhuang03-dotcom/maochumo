@@ -34,6 +34,7 @@ jobs:
       - run: npm run db:seed && npm run db:seed
       - run: npm run check
       - run: |
-          npm start > /tmp/maochumo-api.log 2>&1 &
+          UPLOAD_DRIVER=local npm start > /tmp/maochumo-api.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/health && break; sleep 1; done
           npm run test:page
+          npm run test:owner-pages

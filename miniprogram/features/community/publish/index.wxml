@@ -1,1 +1,10 @@
-<view class="page"><view class="title">{{title}}</view><view class="notice">开发占位 · {{owner}}负责。功能尚未实现，接口状态和任务见仓库任务卡。</view><view wx:if="{{catId}}">猫咪编号：{{catId}}</view><button bindtap="back">返回</button></view>
+<view class="page"><view class="title">分享猫咪日常</view><view class="subtitle">可以只写文字或只发图片，不必填写遇见区域</view>
+<textarea value="{{body}}" bindinput="bodyInput" maxlength="-1" disabled="{{busy || pending}}" placeholder="今天遇见了怎样的猫咪？" auto-height/><view class="muted">{{length}} / 2000 字</view>
+<view class="photos"><view wx:for="{{images}}" wx:key="path" class="photo-cell"><image src="{{item.path}}" mode="aspectFill" data-path="{{item.path}}" bindtap="preview"/><button size="mini" data-index="{{index}}" bindtap="removeImage" disabled="{{busy || pending}}">移除</button></view></view>
+<button bindtap="chooseImages" disabled="{{busy || pending || images.length >= 9}}">添加图片（{{images.length}} / 9）</button><view class="muted">JPEG / PNG / WebP，每张最多8MB</view>
+<view class="section-title">话题（可不选）</view><view class="choices"><button wx:for="{{topics}}" wx:key="id" class="{{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" data-kind="topic" bindtap="toggle" disabled="{{busy || pending}}">{{item.name}}</button></view>
+<view class="section-title">关联猫咪（已选 {{catIds.length}}）</view><view class="muted">重名按档案编号区分；校外猫可不关联</view><input value="{{catQ}}" bindinput="catInput" bindconfirm="searchCats" placeholder="搜索名字或别名"/><button bindtap="searchCats">查找猫咪</button>
+<view class="choices"><button wx:for="{{cats}}" wx:key="id" class="{{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" data-kind="cat" bindtap="toggle" disabled="{{busy || pending}}">{{item.name}} · {{item.id}}</button></view><button wx:if="{{catMore}}" bindtap="moreCats" disabled="{{catLoading}}">更多猫咪</button>
+<view wx:if="{{optionsError}}" class="notice">{{optionsError}}<button bindtap="loadOptions">重新加载选项</button></view>
+<view class="notice" wx:if="{{pending}}">正在确认这次提交的结果。草稿已保留，请使用下方按钮重试原请求，不会重复发帖。</view><view class="notice" aria-live="polite">{{message}}</view>
+<button class="primary" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{pending ? '确认结果 / 重试原提交' : '发布帖子'}}</button></view>

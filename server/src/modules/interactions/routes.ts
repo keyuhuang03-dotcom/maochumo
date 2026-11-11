@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { identity } from "../../common/auth";
 import { rows, transaction } from "../../common/db";
 import { ok, pending, unavailable } from "../../common/http";
+import { commentRoutes } from "./comments";
 export async function interactionsRoutes(app: FastifyInstance) {
   app.put<{ Params: { postId: string }; Body: { liked: boolean } }>(
     "/api/v1/posts/:postId/like",
@@ -43,9 +44,5 @@ export async function interactionsRoutes(app: FastifyInstance) {
       });
     },
   );
-  app.get("/api/v1/posts/:postId/comments", async () => pending());
-  app.post("/api/v1/posts/:postId/comments", async (r) => {
-    await identity(r);
-    return pending();
-  });
+  await commentRoutes(app);
 }
