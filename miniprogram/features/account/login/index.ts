@@ -21,7 +21,7 @@ Page({
     this.setData({ busy: true, message: "" });
     try {
       if (e.currentTarget.dataset.mode === "dev")
-        await developmentLogin(this.data.key);
+        await developmentLogin(this.data.key.trim());
       else await wechatLogin();
       this.setData({ key: "" });
       resume(this.data.returnTo);

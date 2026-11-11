@@ -1,0 +1,4 @@
+.muted {color:#625B53;font-size:26rpx;}
+.notice {margin:20rpx 0;color:#625B53;}
+.card {margin:24rpx 0;background:white;padding:28rpx;border-radius:20rpx;}
+.component-button {min-height:88rpx;margin:20rpx 0;font-size:30rpx;background:#EEE8DF;color:#302D29;border-radius:16rpx;}
