@@ -20,12 +20,17 @@
     "check": "npm run typecheck && npm run build && npm test",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
-    "format": "prettier --write \"server/**/*.ts\" \"miniprogram/**/*.ts\" \"contracts/*.{ts,json,md}\" \"scripts/*.mjs\" \"docs/*.md\" \"*.{json,md,yaml}\" \".github/**/*.yml\""
+    "format": "prettier --write \"server/**/*.ts\" \"miniprogram/**/*.ts\" \"contracts/*.{ts,json,md}\" \"scripts/*.mjs\" \"docs/*.md\" \"*.{json,md,yaml}\" \".github/**/*.yml\"",
+    "start:demo": "node scripts/start-demo.mjs",
+    "test:owner-pages": "node scripts/test-owner-pages.mjs",
+    "debug:server": "node --inspect=127.0.0.1:9229 --import tsx server/src/index.ts"
   },
   "dependencies": {
+    "@fastify/multipart": "10.1.8",
     "dotenv": "17.2.3",
     "fastify": "5.12.8",
-    "mysql2": "3.24.6"
+    "mysql2": "3.24.6",
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@types/node": "24.10.0",

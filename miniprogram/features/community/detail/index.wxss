@@ -1,1 +1,1 @@
-/* Feature styles; shared tokens are in app.wxss. */
+.section-title{font-size:34rpx;font-weight:600;margin-top:40rpx}.comment{padding:24rpx 0;border-bottom:1px solid #DDD6CC}.comment-body{white-space:pre-wrap;word-break:break-all}.focused{background:#F2E7D5}.comment button{margin:12rpx 0}

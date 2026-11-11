@@ -37,7 +37,18 @@ export function back(fallback: RouteName = "home") {
   else go(fallback);
 }
 export function resume(name: string | undefined) {
+  const pages = getCurrentPages();
+  if (pages.length > 1) {
+    wx.navigateBack();
+    return;
+  }
   const key = name as RouteName;
-  if (key && Object.prototype.hasOwnProperty.call(routes, key)) go(key);
+  if (
+    key &&
+    Object.prototype.hasOwnProperty.call(routes, key) &&
+    key !== "post" &&
+    key !== "cat"
+  )
+    go(key);
   else go("account");
 }

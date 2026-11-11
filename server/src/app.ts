@@ -20,33 +20,29 @@ export function buildApp() {
     const known = error instanceof ApiError;
     const validation = error instanceof Error && "validation" in error;
     const status = known ? error.statusCode : validation ? 400 : 503;
-    reply
-      .code(status)
-      .send({
-        ok: false,
-        error: {
-          code: known
-            ? error.code
-            : validation
-              ? "VALIDATION_ERROR"
-              : "SERVICE_UNAVAILABLE",
-          message: known
-            ? error.message
-            : validation
-              ? "参数无效"
-              : "服务暂不可用，请稍后重试",
-        },
-        requestId: r.id,
-      });
+    reply.code(status).send({
+      ok: false,
+      error: {
+        code: known
+          ? error.code
+          : validation
+            ? "VALIDATION_ERROR"
+            : "SERVICE_UNAVAILABLE",
+        message: known
+          ? error.message
+          : validation
+            ? "参数无效"
+            : "服务暂不可用，请稍后重试",
+      },
+      requestId: r.id,
+    });
   });
   app.setNotFoundHandler((r, reply) =>
-    reply
-      .code(404)
-      .send({
-        ok: false,
-        error: { code: "NOT_FOUND", message: "接口不存在" },
-        requestId: r.id,
-      }),
+    reply.code(404).send({
+      ok: false,
+      error: { code: "NOT_FOUND", message: "接口不存在" },
+      requestId: r.id,
+    }),
   );
   app.get("/health", async (r) => {
     await db.query("SELECT 1");

@@ -8,7 +8,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
-import { join } from "node:path";
+import { join, relative, dirname } from "node:path";
 // Use tsc only for TS -> JS; WXML/WXSS are compiled by WeChat DevTools later.
 const result = spawnSync(
   process.execPath,
@@ -53,3 +53,27 @@ if (existsSync("miniprogram/core/env.local.ts"))
 console.log(
   `Mini JS build and manifest checks passed: ${app.pages.length} pages, 5 tabs. WXML/WXSS platform compile still requires DevTools.`,
 );
+
+mkdirSync("dist/miniprogram/shared", { recursive: true });
+cpSync(
+  "dist/mini-build/contracts/index.js",
+  "dist/miniprogram/shared/contracts.js",
+);
+function relocate(dir) {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) relocate(p);
+    else if (e.name.endsWith(".js")) {
+      const target = relative(
+        dirname(p),
+        "dist/miniprogram/shared/contracts",
+      ).replaceAll("\\", "/");
+      const code = readFileSync(p, "utf8").replace(
+        /require\(["'](?:\.\.\/)+contracts(?:\/index)?["']\)/g,
+        () => `require('${target.startsWith(".") ? target : "./" + target}')`,
+      );
+      writeFileSync(p, code);
+    }
+  }
+}
+relocate("dist/miniprogram");
