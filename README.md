@@ -33,6 +33,8 @@ npm run debug:server # 本机 9229 调试端口，与其它服务启动命令二
 
 ## 协作入口
 
+- [产品需求说明书（最终版 PDF）](docs/reference/猫出没微信小程序需求说明书-最终版.pdf)
+- [系统设计说明书（视觉优化版 PDF）](docs/reference/猫出没微信小程序系统设计说明书-视觉优化版.pdf)
 - [开发与调试](docs/DEVELOPMENT.md)、[架构](docs/ARCHITECTURE.md)
 - [四人边界](docs/OWNERSHIP.md)、[A/B/C 可领取任务与七天里程碑](docs/TASKS.md)
 - [决策及待确认项](docs/DECISIONS.md)、[接口契约](contracts/README.md)
