@@ -1,2 +1,142 @@
-@import "../shared.wxss";
-.author{font-weight:600}.post-body{margin:16rpx 0;white-space:pre-wrap;word-break:break-all}.photos{display:flex;flex-wrap:wrap;gap:12rpx}.photo{width:180rpx;height:180rpx;border-radius:12rpx}.tags{display:flex;flex-wrap:wrap;gap:12rpx}.tag-button{margin:12rpx 0;min-height:64rpx;font-size:24rpx;line-height:64rpx;padding:0 16rpx}
+.post-card {
+  margin: 18rpx 0;
+  padding: 20rpx;
+  border: 1px solid #d4ddcb;
+  border-radius: 30rpx;
+  background: #fffefa;
+  color: #30392e;
+  font-size: 29rpx;
+  line-height: 1.65;
+}
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-size: 26rpx;
+  font-weight: 600;
+  gap: 4rpx;
+}
+.time {
+  font-size: 24rpx;
+}
+.post-body {
+  margin: 24rpx 0 22rpx;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+.photo {
+  width: calc((100% - 28rpx) / 3);
+  height: 210rpx;
+  border-radius: 18rpx;
+}
+.one-photo .photo {
+  width: 100%;
+  height: 420rpx;
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+.tag-button {
+  margin: 0;
+  padding: 12rpx 18rpx;
+  min-height: 52rpx;
+  line-height: 1.4;
+  background: #e8eedd;
+  color: #587649;
+  font-size: 23rpx;
+  border-radius: 12rpx;
+  text-align: left;
+}
+.tag-button::after,
+.action::after {
+  border: 0;
+}
+.actions {
+  display: flex;
+  gap: 12rpx;
+  justify-content: flex-end;
+  margin-top: 22rpx;
+}
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  min-height: 76rpx;
+  line-height: 1.2;
+  margin: 0;
+  padding: 18rpx 28rpx;
+  background: #e8eedd;
+  color: #587649;
+  border-radius: 22rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.liked {
+  background: #587649;
+  color: white;
+}
+.action-icon {
+  width: 28rpx;
+  height: 28rpx;
+}
+.message {
+  font-size: 24rpx;
+  color: #687360;
+  margin-top: 12rpx;
+}
+.detail-card {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 28rpx 0;
+}
+.detail-card .byline {
+  display: block;
+  font-size: 30rpx;
+}
+.detail-card .time {
+  display: block;
+  color: #737c6d;
+  font-weight: 400;
+  margin-top: 10rpx;
+}
+.detail-card .post-body {
+  font-size: 32rpx;
+  margin-top: 44rpx;
+}
+.detail-card .photo {
+  height: 232rpx;
+}
+.detail-card .one-photo .photo {
+  height: 500rpx;
+}
+.tag-button,
+.action {
+  width: auto;
+  max-width: none;
+  flex: none;
+}
+.tag-button {
+  width: calc((100% - 24rpx) / 3) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  text-align: left;
+}
+.action {
+  width: 150rpx !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+.actions .action:last-child {
+  width: 180rpx !important;
+}

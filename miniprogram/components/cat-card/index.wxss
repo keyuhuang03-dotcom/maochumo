@@ -1,1 +1,30 @@
-@import "../shared.wxss";
+.cat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+  padding: 30rpx 0 20rpx;
+  color: #30392e;
+}
+.cat-copy {
+  min-width: 0;
+  flex: 1;
+}
+.cat-name {
+  font-size: 29rpx;
+  font-weight: 600;
+}
+.cat-caption {
+  color: #737c6d;
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}
+.cat-id {
+  font-size: 20rpx;
+  color: #737c6d;
+  margin-top: 4rpx;
+}
+.chevron {
+  width: 24rpx;
+  height: 24rpx;
+}

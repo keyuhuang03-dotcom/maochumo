@@ -189,6 +189,30 @@ try {
   );
   assert.equal(comments.length, 1);
   assert(detail.data.comments.some((c) => c.id === comments[0].id));
+  let cardDefinition;
+  global.Component = (definition) => {
+    cardDefinition = definition;
+  };
+  require("../dist/miniprogram/components/post-card/index.js");
+  const card = {
+    ...cardDefinition.methods,
+    data: {
+      ...structuredClone(cardDefinition.data),
+      post: structuredClone(detail.data.post),
+    },
+    setData(value) {
+      Object.assign(this.data, value);
+    },
+  };
+  losePath = "/like";
+  await card.like();
+  assert.equal(card.data.likeTarget, false);
+  await card.like();
+  assert.equal(card.data.post.liked, false);
+  assert.equal(card.data.post.likeCount, 0);
+  console.log(
+    "PASS reference PostCard target-state like retry against real HTTP",
+  );
   await detail.remove();
   assert(navigations.includes("/features/community/home/index"));
   const gone = await fetch("http://127.0.0.1:3000/api/v1/posts/" + postId);

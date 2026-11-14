@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "猫出没",
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "navigationStyle": "custom"
 }

@@ -1,1 +1,1 @@
-<view class="card" bindtap="open" role="button" aria-label="查看猫咪档案"><view>{{cat.name}}</view><view class="muted">{{cat.appearance || '暂无外貌资料'}}</view><view class="muted">编号：{{cat.id}}</view></view>
+<view class="cat-row" bindtap="open" role="button" aria-label="查看猫咪档案"><view class="cat-copy"><view class="cat-name">{{cat.name}}</view><view class="cat-caption">查看照片、特征和相关帖子</view><view class="cat-id">{{cat.id}}</view></view><image class="chevron" src="/assets/ui/right-green.png"/></view>

@@ -38,6 +38,7 @@ Page({
     catPage: 0,
     catMore: false,
     catLoading: false,
+    chosenTags: [] as Ref[],
   },
   draftKey: "",
   catSequence: 0,
@@ -56,7 +57,34 @@ Page({
         wx.removeStorageSync("maochumo.publish.guest");
       }
     }
-    void this.loadOptions();
+    void this.loadOptions().then(() => this.updateChosenTags());
+  },
+  updateChosenTags() {
+    this.setData({
+      chosenTags: [
+        ...this.data.topicIds.map((id) => ({
+          id,
+          name:
+            this.data.topics.find((t) => t.id === id)?.name ||
+            this.data.chosenTags.find((t) => t.id === id)?.name ||
+            "话题",
+        })),
+        ...this.data.catIds.map((id) => ({
+          id,
+          name:
+            this.data.cats.find((c) => c.id === id)?.name ||
+            this.data.chosenTags.find((c) => c.id === id)?.name ||
+            "猫咪档案",
+        })),
+      ],
+    });
+  },
+  applyTags(catIds: string[], topicIds: string[], chosenTags: Ref[]) {
+    this.setData({ catIds, topicIds, chosenTags });
+    this.persist();
+  },
+  selectTags() {
+    if (!this.data.busy && !this.data.pending) go("tags");
   },
   persist() {
     const { body, images, catIds, topicIds, pending } = this.data;
@@ -243,7 +271,7 @@ Page({
       const post = await api.createPost(payload);
       wx.removeStorageSync(this.draftKey);
       this.setData({ ...empty(), length: 0 });
-      go("post", { postId: post.id });
+      go("success", { postId: post.id });
     } catch (e) {
       if (!resultUnknown(e)) {
         this.setData({ pending: null });
