@@ -45,11 +45,14 @@ export function request<T>(
           );
         reject(new RequestError("服务响应异常，请重试", "INVALID_RESPONSE"));
       },
-      fail() {
+      fail(error) {
         reject(
           new RequestError(
             method === "GET"
-              ? "网络连接失败，请重试"
+              ? env.development &&
+                /^http:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(env.apiBase)
+                ? "本机后端未连接。请在电脑双击“启动猫出没.command”，保持窗口打开后再重试。"
+                : "网络连接失败，请检查网络后重试"
               : "网络中断，操作结果未知；请保留输入并使用原请求标识重试",
             "NETWORK_ERROR",
           ),

@@ -10,13 +10,22 @@ Page({
     page: 1,
     hasMore: false,
   },
+  sequence: 0,
+  onPullDownRefresh() {
+    void this.load().finally(() => wx.stopPullDownRefresh());
+  },
+  onReachBottom() {
+    void this.more();
+  },
   onShow() {
     void this.load();
   },
   async load() {
+    const sequence = ++this.sequence;
     this.setData({ state: "loading", message: "", posts: [] });
     try {
       const result = await api.posts();
+      if (sequence !== this.sequence) return;
       this.setData({
         posts: result.items,
         state: result.items.length ? "ready" : "empty",
@@ -24,14 +33,17 @@ Page({
         hasMore: result.hasMore,
       });
     } catch (e) {
-      this.setData({ state: "error", message: errorMessage(e) });
+      if (sequence === this.sequence)
+        this.setData({ state: "error", message: errorMessage(e) });
     }
   },
   async more() {
     if (!this.data.hasMore || this.data.state === "loading") return;
+    const sequence = this.sequence;
     this.setData({ state: "loading" });
     try {
       const result = await api.posts(this.data.page + 1);
+      if (sequence !== this.sequence) return;
       this.setData({
         posts: this.data.posts.concat(result.items),
         page: result.page,
@@ -39,7 +51,8 @@ Page({
         state: "ready",
       });
     } catch (e) {
-      this.setData({ state: "error", message: errorMessage(e) });
+      if (sequence === this.sequence)
+        this.setData({ state: "error", message: errorMessage(e) });
     }
   },
   openPost(e: WechatMiniprogram.CustomEvent<{ postId: string }>) {

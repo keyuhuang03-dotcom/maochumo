@@ -1,1 +1,1 @@
-/* Feature styles; shared tokens are in app.wxss. */
+.home-tools{position:sticky;top:0;z-index:2;display:flex;gap:20rpx;background:#FAF8F4;padding:12rpx 0;}.home-tools button{flex:1;}

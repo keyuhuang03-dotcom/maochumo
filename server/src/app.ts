@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import { randomUUID } from "node:crypto";
 import { db } from "./common/db";
+import { config } from "./config";
 import { ApiError, ok } from "./common/http";
 import { identityRoutes } from "./modules/identity/routes";
 import { postsRoutes } from "./modules/posts/routes";
@@ -46,8 +47,15 @@ export function buildApp() {
   );
   app.get("/health", async (r) => {
     await db.query("SELECT 1");
-    return ok(r, { status: "ready" });
+    return ok(r, { status: "ready", service: "maochumo" });
   });
+  app.get("/api/v1/capabilities", async (r) =>
+    ok(r, {
+      wechatLogin: !!config.wxAppId && !!config.wxAppSecret,
+      developmentLogin: config.env === "development" && config.devAuth,
+      localUpload: config.uploadDriver === "local",
+    }),
+  );
   for (const routes of [
     identityRoutes,
     postsRoutes,

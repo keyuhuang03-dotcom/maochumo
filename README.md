@@ -16,7 +16,7 @@ npm run db:up
 npm run db:migrate
 npm run db:seed
 npm run build
-npm run start:demo  # 本机开发身份 + 本地真实图片存储
+npm run start:demo  # 检查数据库、迁移种子、重建小程序并启动本地Demo
 ```
 
 `setup` 只在 .env 不存在时生成随机本地密码，不打印密钥。没有 Docker 时，手动建 `maochumo_demo` 空库及专用账号，修改 .env 的 DB\_\* 后从迁移继续。不要将已有业务库当演示库。
@@ -43,3 +43,5 @@ npm run debug:server # 本机 9229 调试端口，与其它服务启动命令二
 仓库为公开仓库，成员可直接查看/克隆；直接推送仍需协作者权限。操作步骤见 [负责人演示与交接](docs/OWNER-DEMO.md)。
 
 main 保持可运行。成员创建 feat/catalog、feat/account、feat/admin 等功能分支，小批量 PR，D2 首版合并、D5 全量合并、D6—D7 测试演示。尚未邀请协作者，待提供三位成员 GitHub 用户名。
+
+本机日常演示可直接双击仓库内“启动猫出没.command”，保持终端窗口打开，再回微信开发者工具编译。此入口会在本机已有项目独立MySQL数据目录时恢复该实例；其它机器仍需按上文安装/配置MySQL或Docker，不自动创建云资源。再次执行会检查现有服务，不会启动重复后端或终止其它项目。

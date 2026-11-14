@@ -1,1 +1,1 @@
-/* Feature styles; shared tokens are in app.wxss. */
+.login-key{min-height:96rpx;height:96rpx;line-height:56rpx;}

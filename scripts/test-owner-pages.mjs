@@ -231,6 +231,40 @@ try {
   console.log(
     "PASS stale map request cannot replace the selected region; login returns to original detail stack",
   );
+
+  const login = page("features/account/login");
+  await login.checkCapabilities();
+  const liveCapabilities = await (
+    await fetch("http://127.0.0.1:3000/api/v1/capabilities")
+  ).json();
+  assert.equal(login.data.devAvailable, liveCapabilities.data.developmentLogin);
+  assert.equal(login.data.wechatAvailable, liveCapabilities.data.wechatLogin);
+  await login.login({ currentTarget: { dataset: { mode: "dev" } } });
+  assert(login.data.message.includes("DEV_LOGIN_KEY"));
+  console.log(
+    "PASS login checks backend capabilities and validates missing local key without sending a failed login",
+  );
+  const originalAreas = api.areas;
+  let finishOld;
+  api.cats = () =>
+    new Promise((resolve) => {
+      finishOld = resolve;
+    });
+  const late = map.select("a");
+  api.areas = async () => ({ items: [] });
+  await map.load();
+  finishOld({
+    items: [{ id: "obsolete-cat" }],
+    page: 1,
+    pageSize: 20,
+    hasMore: false,
+  });
+  await late;
+  assert.deepEqual(map.data.cats, []);
+  assert.equal(map.data.areaId, "");
+  api.cats = original;
+  api.areas = originalAreas;
+  console.log("PASS map refresh invalidates an old region-list request");
 } finally {
   const [owned] = await db.execute("SELECT id FROM posts WHERE author_id=?", [
     actor,
