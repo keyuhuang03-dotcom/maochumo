@@ -1,1 +1,123 @@
-.section-title{font-size:34rpx;font-weight:600;margin-top:40rpx}.comment{padding:24rpx 0;border-bottom:1px solid #DDD6CC}.comment-body{white-space:pre-wrap;word-break:break-all}.focused{background:#F2E7D5}.comment button{margin:12rpx 0}
+.detail-page {
+  padding-bottom: 220rpx;
+}
+.detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 26rpx 0 40rpx;
+}
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin: 0;
+  min-width: 156rpx;
+  font-weight: 600;
+}
+.delete-button {
+  background: transparent;
+  color: #737c6d;
+  font-size: 25rpx;
+  margin: 0;
+}
+.comment {
+  padding: 22rpx 0 26rpx;
+}
+.comment-author {
+  font-size: 26rpx;
+  color: #737c6d;
+}
+.comment-body {
+  font-size: 30rpx;
+  margin: 16rpx 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.reply-caption {
+  font-size: 23rpx;
+  color: #737c6d;
+  margin-top: 8rpx;
+}
+.reply-button {
+  display: inline-block;
+  min-height: 56rpx;
+  margin: 0;
+  padding: 10rpx 20rpx;
+  font-size: 24rpx;
+  border-radius: 12rpx;
+}
+.focused {
+  background: #f0f3ea;
+  border-radius: 16rpx;
+}
+.composer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #f6f4ed;
+  padding: 20rpx 38rpx calc(20rpx + env(safe-area-inset-bottom));
+}
+.composer-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 20rpx;
+}
+.comment-input {
+  background: transparent;
+  margin: 0;
+  padding: 16rpx 0;
+  min-height: 54rpx;
+  max-height: 190rpx;
+  flex: 1;
+  line-height: 1.5;
+  border-radius: 0;
+  font-size: 28rpx;
+}
+.send-button {
+  margin: 0;
+  min-width: 136rpx;
+  text-align: center;
+}
+.reply-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: #587649;
+  margin-bottom: 8rpx;
+}
+.cancel-reply {
+  background: transparent;
+  font-size: 24rpx;
+  padding: 4rpx;
+  margin: 0;
+  min-height: 40rpx;
+}
+.like-button,
+.delete-button,
+.reply-button,
+.send-button,
+.cancel-reply {
+  width: auto;
+}
+button.send-button {
+  width: 136rpx !important;
+}
+.like-button {
+  width: 156rpx !important;
+}
+.reply-button,
+.delete-button,
+.cancel-reply {
+  width: auto !important;
+  min-width: 0;
+}
+.reply-button {
+  width: 120rpx !important;
+}
+.delete-button {
+  width: 80rpx !important;
+}

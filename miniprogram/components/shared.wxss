@@ -1,4 +1,30 @@
-.muted {color:#625B53;font-size:26rpx;}
-.notice {margin:20rpx 0;color:#625B53;}
-.card {margin:24rpx 0;background:white;padding:28rpx;border-radius:20rpx;}
-.component-button {min-height:88rpx;margin:20rpx 0;font-size:30rpx;background:#EEE8DF;color:#302D29;border-radius:16rpx;}
+.muted {
+  color: #737c6d;
+  font-size: 24rpx;
+}
+.notice {
+  margin: 24rpx 0;
+  color: #687360;
+  font-size: 26rpx;
+}
+.card {
+  margin: 20rpx 0;
+  background: #fffefa;
+  padding: 20rpx;
+  border: 1px solid #d4ddcb;
+  border-radius: 30rpx;
+}
+.component-button {
+  box-sizing: border-box;
+  min-height: 80rpx;
+  margin: 12rpx 0;
+  padding: 16rpx 24rpx;
+  background: #e8eedd;
+  color: #587649;
+  font-size: 28rpx;
+  line-height: 1.4;
+  border-radius: 16rpx;
+}
+.component-button::after {
+  border: 0;
+}

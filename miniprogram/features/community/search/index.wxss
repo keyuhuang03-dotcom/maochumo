@@ -1,1 +1,22 @@
-/* Feature styles; shared tokens are in app.wxss. */
+.search-row {
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+}
+.search-row input {
+  flex: 1;
+  margin: 0;
+}
+.search-row button {
+  margin: 0;
+}
+.filter-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 22rpx 0;
+}
+.search-row button {
+  width: 120rpx !important;
+  min-width: 0;
+}

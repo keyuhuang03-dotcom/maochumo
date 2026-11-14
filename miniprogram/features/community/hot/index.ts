@@ -23,6 +23,9 @@ Page({
   openPost(e: WechatMiniprogram.CustomEvent<{ postId: string }>) {
     go("post", { postId: e.detail.postId });
   },
+  openRow(e: WechatMiniprogram.TouchEvent) {
+    go("post", { postId: e.currentTarget.dataset.id });
+  },
   back() {
     back();
   },

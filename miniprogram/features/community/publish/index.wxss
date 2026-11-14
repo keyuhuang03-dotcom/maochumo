@@ -1,1 +1,110 @@
-.photos{display:flex;flex-wrap:wrap;gap:16rpx}.photo-cell{width:200rpx}.photo-cell image{width:200rpx;height:200rpx;border-radius:12rpx}.choices{display:flex;flex-wrap:wrap;gap:12rpx}.choices button{margin:8rpx 0;font-size:26rpx;word-break:break-all}.choices .selected{background:#81532F;color:white}.section-title{font-size:32rpx;font-weight:600;margin-top:36rpx}
+.publish-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 320rpx);
+  padding-top: 40rpx;
+}
+.publish-prompt {
+  font-size: 30rpx;
+  color: #737c6d;
+  margin-bottom: 24rpx;
+}
+.post-editor {
+  height: 270rpx;
+  min-height: 270rpx;
+  background: #f6f4ed;
+  padding: 26rpx;
+  margin: 0;
+  border-radius: 22rpx;
+}
+.word-count {
+  text-align: right;
+  font-size: 22rpx;
+  color: #737c6d;
+  margin-top: 8rpx;
+}
+.over-limit {
+  color: #9e453c;
+}
+.draft-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+.draft-photo {
+  position: relative;
+  width: calc((100% - 28rpx) / 3);
+  margin-top: 18rpx;
+}
+.draft-photo > image {
+  width: 100%;
+  height: 190rpx;
+  border-radius: 18rpx;
+}
+.remove-image {
+  position: absolute;
+  top: 4rpx;
+  right: 4rpx;
+  margin: 0;
+  padding: 4rpx;
+  width: 40rpx;
+  min-height: 40rpx;
+  height: 40rpx;
+  background: #30392e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.remove-image image {
+  width: 26rpx;
+  height: 26rpx;
+}
+.add-image {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  align-self: flex-start;
+  margin-top: 32rpx;
+  font-weight: 600;
+  min-width: 260rpx;
+}
+.tag-instruction {
+  font-size: 25rpx;
+  color: #737c6d;
+  margin: 32rpx 0 24rpx;
+}
+.select-tags {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32rpx;
+  font-weight: 600;
+}
+.publish-spacer {
+  flex: 1;
+  min-height: 60rpx;
+}
+.publish-button {
+  margin-bottom: 20rpx;
+}
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+.add-image {
+  width: auto;
+}
+.remove-image {
+  width: 40rpx;
+}
+.add-image {
+  width: 280rpx !important;
+}
+.select-tags {
+  width: 100% !important;
+}
+.add-image {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}

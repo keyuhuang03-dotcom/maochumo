@@ -9,6 +9,8 @@ Page({
     message: "",
     page: 1,
     hasMore: false,
+    hotPost: null as Post | null,
+    toolbarTop: 64,
   },
   sequence: 0,
   onPullDownRefresh() {
@@ -17,6 +19,15 @@ Page({
   onReachBottom() {
     void this.more();
   },
+  onLoad() {
+    const info = wx.getWindowInfo();
+    const capsule = wx.getMenuButtonBoundingClientRect();
+    this.setData({
+      toolbarTop:
+        info.statusBarHeight +
+        Math.max(44, (capsule.top - info.statusBarHeight) * 2 + capsule.height),
+    });
+  },
   onShow() {
     void this.load();
   },
@@ -24,10 +35,14 @@ Page({
     const sequence = ++this.sequence;
     this.setData({ state: "loading", message: "", posts: [] });
     try {
-      const result = await api.posts();
+      const [result, hot] = await Promise.all([
+        api.posts(),
+        api.hot().catch(() => ({ items: [] as Post[], asOf: "" })),
+      ]);
       if (sequence !== this.sequence) return;
       this.setData({
         posts: result.items,
+        hotPost: hot.items[0] || null,
         state: result.items.length ? "ready" : "empty",
         page: 1,
         hasMore: result.hasMore,

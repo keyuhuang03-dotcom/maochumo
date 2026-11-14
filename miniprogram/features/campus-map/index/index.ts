@@ -4,7 +4,7 @@ import { errorMessage } from "../../../core/request";
 import { go } from "../../../core/routes";
 Page({
   data: {
-    areas: [] as Area[],
+    areas: [] as (Area & { label?: string })[],
     cats: [] as Cat[],
     state: "loading",
     message: "",
@@ -34,7 +34,10 @@ Page({
       const result = await api.areas();
       if (mapSequence !== this.mapSequence) return;
       this.setData({
-        areas: result.items,
+        areas: result.items.map((a) => ({
+          ...a,
+          label: a.name.replace(/^示例/, ""),
+        })),
         mapState: result.items.length ? "ready" : "empty",
         state: "idle",
       });
@@ -96,6 +99,17 @@ Page({
   },
   retry() {
     void this.select(this.data.areaId);
+  },
+  all() {
+    ++this.sequence;
+    this.setData({
+      areaId: "",
+      areaName: "",
+      cats: [],
+      state: "idle",
+      page: 0,
+      hasMore: false,
+    });
   },
   choose(e: WechatMiniprogram.TouchEvent) {
     void this.select(e.currentTarget.dataset.id);

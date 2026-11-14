@@ -1,0 +1,19 @@
+.success-page {
+  text-align: center;
+  padding-top: 160rpx;
+}
+.success-check {
+  width: 100rpx;
+  height: 100rpx;
+}
+.success-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  margin: 24rpx 0 12rpx;
+}
+.success-buttons {
+  margin-top: 70rpx;
+}
+.success-buttons button {
+  text-align: left;
+}

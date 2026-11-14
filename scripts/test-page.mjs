@@ -35,7 +35,7 @@ const page = {
 await page.load();
 assert.equal(page.data.state, "ready");
 assert(page.data.posts.some((p) => p.id === "demo-post-public"));
-assert.equal(requests, 1);
+assert.equal(requests, 2);
 console.log(
   "PASS compiled home Page -> unified request -> HTTP -> MySQL -> setData (platform rendering NOT verified)",
 );

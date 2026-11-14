@@ -18,45 +18,58 @@
     "features/admin/cats/index",
     "features/admin/areas/index",
     "features/admin/topics/index",
-    "features/admin/posts/index"
+    "features/admin/posts/index",
+    "features/community/tags/index",
+    "features/community/success/index"
   ],
   "window": {
     "navigationBarTitleText": "猫出没",
-    "navigationBarBackgroundColor": "#FAF8F4",
+    "navigationBarBackgroundColor": "#FFFEFA",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FAF8F4"
+    "backgroundColor": "#FFFEFA"
   },
   "tabBar": {
-    "color": "#625B53",
-    "selectedColor": "#81532F",
-    "backgroundColor": "#FFFFFF",
+    "color": "#737C6D",
+    "selectedColor": "#587649",
+    "backgroundColor": "#FFFEFA",
     "list": [
       {
         "pagePath": "features/community/home/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "assets/ui/home-muted.png",
+        "selectedIconPath": "assets/ui/home-green.png"
       },
       {
         "pagePath": "features/campus-map/index/index",
-        "text": "地图"
+        "text": "地图",
+        "iconPath": "assets/ui/map-muted.png",
+        "selectedIconPath": "assets/ui/map-green.png"
       },
       {
         "pagePath": "features/community/publish/index",
-        "text": "发布"
+        "text": "发布",
+        "iconPath": "assets/ui/plus-muted.png",
+        "selectedIconPath": "assets/ui/plus-green.png"
       },
       {
         "pagePath": "features/catalog/list/index",
-        "text": "图鉴"
+        "text": "图鉴",
+        "iconPath": "assets/ui/catalog-muted.png",
+        "selectedIconPath": "assets/ui/catalog-green.png"
       },
       {
         "pagePath": "features/account/index/index",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "assets/ui/user-muted.png",
+        "selectedIconPath": "assets/ui/user-green.png"
       }
     ]
   },
   "usingComponents": {
     "post-card": "/components/post-card/index",
     "cat-card": "/components/cat-card/index",
-    "view-state": "/components/view-state/index"
+    "view-state": "/components/view-state/index",
+    "ui-header": "/components/ui-header/index"
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2"

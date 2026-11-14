@@ -1,1 +1,35 @@
-/* Feature styles; shared tokens are in app.wxss. */
+.hot-explain {
+  margin: 20rpx 0 40rpx;
+}
+.ranking-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  background: #f6f4ed;
+  color: #30392e;
+  border-radius: 22rpx;
+  min-height: 136rpx;
+  margin: 24rpx 0;
+  padding: 24rpx;
+}
+.ranking-copy {
+  min-width: 0;
+  flex: 1;
+}
+.ranking-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 10rpx;
+}
+.rank-chevron {
+  width: 28rpx;
+  height: 28rpx;
+  flex-shrink: 0;
+}
+.ranking-row {
+  width: 100% !important;
+}

@@ -8,6 +8,8 @@ export const routes = {
   cat: "/features/catalog/detail/index",
   search: "/features/community/search/index",
   hot: "/features/community/hot/index",
+  tags: "/features/community/tags/index",
+  success: "/features/community/success/index",
   settings: "/features/account/settings/index",
   posts: "/features/account/posts/index",
   likes: "/features/account/likes/index",

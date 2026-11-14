@@ -1,1 +1,8 @@
 @import "../shared.wxss";
+.component-button {
+  text-align: center;
+}
+.notice {
+  padding: 20rpx 0;
+  line-height: 1.7;
+}
