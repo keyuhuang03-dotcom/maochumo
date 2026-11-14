@@ -16,13 +16,23 @@ Page({
     mapError: "",
   },
   sequence: 0,
+  mapSequence: 0,
+  onPullDownRefresh() {
+    void this.load().finally(() => wx.stopPullDownRefresh());
+  },
+  onReachBottom() {
+    void this.more();
+  },
   onShow() {
     void this.load();
   },
   async load() {
+    const mapSequence = ++this.mapSequence;
+    ++this.sequence;
     this.setData({ mapState: "loading", mapError: "" });
     try {
       const result = await api.areas();
+      if (mapSequence !== this.mapSequence) return;
       this.setData({
         areas: result.items,
         mapState: result.items.length ? "ready" : "empty",
@@ -35,7 +45,8 @@ Page({
         await this.select(this.data.areaId);
       else this.setData({ areaId: "", areaName: "", cats: [] });
     } catch (e) {
-      this.setData({ mapState: "error", mapError: errorMessage(e) });
+      if (mapSequence === this.mapSequence)
+        this.setData({ mapState: "error", mapError: errorMessage(e) });
     }
   },
   async select(id: string) {
