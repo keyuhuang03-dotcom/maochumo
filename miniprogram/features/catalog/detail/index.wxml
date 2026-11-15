@@ -1,1 +1,43 @@
-<view class="page"><view class="title">{{title}}</view><view class="notice">开发占位 · {{owner}}负责。功能尚未实现，接口状态和任务见仓库任务卡。</view><view wx:if="{{catId}}">猫咪编号：{{catId}}</view><button bindtap="back">返回</button></view>
+<view class="container">
+
+  <!-- 1. 状态组件（自己闭合，不需要单独的结束标签） -->
+  <view-state
+    state="{{viewState}}"
+    message="{{viewMessage}}"
+    bind:retry="onRetry"
+  />
+
+  <!-- 2. 正常内容展示区（使用 block 包裹，block 不会渲染成实际节点，但必须严格闭合） -->
+  <block wx:if="{{viewState === 'idle' && cat}}">
+
+    <!-- 猫咪基础档案卡片 -->
+    <view class="profile-card">
+      <image wx:for="{{photos}}" wx:key="*this" src="{{item}}" mode="aspectFill" class="profile-img" data-url="{{item}}" bindtap="preview"></image>
+      <view wx:if="{{!photos.length}}" class="profile-img placeholder">暂无猫咪照片</view>
+
+      <view class="profile-info">
+        <view class="name">{{cat.name}}</view>
+        <view class="aliases" wx:if="{{cat.aliases && cat.aliases.length > 0}}">别名：{{aliasText}}</view>
+        <view class="attr">性别：{{cat.sex === 'male' ? '公' : (cat.sex === 'female' ? '母' : '未知')}}</view>
+        <view class="attr">性格：{{cat.personality || '暂无记录'}}</view>
+        <view class="attr">外貌：{{cat.appearance || '暂无记录'}}</view>
+      </view>
+    </view>
+
+    <!-- 关联帖子列表标题 -->
+    <view class="section-title">关联帖子 ({{posts.length}})</view>
+
+    <!-- 没有帖子时的空状态 -->
+    <view wx:if="{{posts.length === 0 && !loading && !postError}}" class="empty-posts">这只猫咪还没有关联帖子哦~</view>
+
+    <view class="attr">主要活动区域：{{areaName || cat.areaId}}</view>
+    <post-card wx:for="{{posts}}" wx:key="id" post="{{item}}" bind:open="onTapPost"/>
+    <view wx:if="{{loading}}">正在加载关联帖子…</view>
+    <view wx:if="{{postError}}">{{postError}}<button bindtap="retryPosts">重试关联帖子</button></view>
+    <button wx:if="{{hasMore}}" bindtap="retryPosts" disabled="{{loading}}">加载更多</button>
+
+  </block>
+  <button bindtap="back">返回</button>
+
+</view>
+<!-- 到这里最外层的 container 结束 -->

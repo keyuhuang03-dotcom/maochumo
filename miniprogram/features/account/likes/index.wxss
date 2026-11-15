@@ -1,1 +1,17 @@
-/* Feature styles; shared tokens are in app.wxss. */
+.container {
+  padding: 30rpx;
+  background-color: #FFFEFA;
+  min-height: 100vh;
+}
+.like-item {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+.empty {
+  text-align: center;
+  margin-top: 100rpx;
+  color: #888;
+  font-size: 28rpx;
+}

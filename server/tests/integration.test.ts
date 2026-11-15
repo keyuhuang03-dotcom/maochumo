@@ -96,6 +96,16 @@ test("authentication, roles and reserved endpoints remain honest", async () => {
         method: "POST",
         url: "/api/v1/admin/cats",
         headers: auth(member),
+        payload: {
+          name: "permission-check",
+          areaId: "demo-area-1",
+          aliases: [],
+          photoRefs: [],
+          sex: "unknown",
+          appearance: null,
+          personality: null,
+          requestKey: "permission-check",
+        },
       })
     ).statusCode,
     403,
@@ -104,11 +114,16 @@ test("authentication, roles and reserved endpoints remain honest", async () => {
     (
       await app.inject({
         method: "POST",
-        url: "/api/v1/admin/cats",
+        url: "/api/v1/admin/topics",
         headers: auth(admin),
+        payload: {
+          name: "校园日常",
+          status: "active",
+          requestKey: "integration-duplicate-topic",
+        },
       })
-    ).statusCode,
-    501,
+    ).json().error.code,
+    "TOPIC_EXISTS",
   );
   assert.equal(
     (
@@ -117,7 +132,7 @@ test("authentication, roles and reserved endpoints remain honest", async () => {
         headers: auth(member),
       })
     ).statusCode,
-    501,
+    200,
   );
   assert.equal(
     (

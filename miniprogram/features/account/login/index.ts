@@ -13,6 +13,8 @@ Page({
     checking: true,
     wechatAvailable: false,
     devAvailable: false,
+    profiles: ["普通成员", "管理员"],
+    profileIndex: 0,
   },
   onLoad(o) {
     this.setData({ returnTo: o.returnTo || "account" });
@@ -35,6 +37,9 @@ Page({
       this.setData({ checking: false });
     }
   },
+  profileChange(e: WechatMiniprogram.PickerChange) {
+    this.setData({ profileIndex: Number(e.detail.value) === 1 ? 1 : 0 });
+  },
   keyInput(e: WechatMiniprogram.Input) {
     this.setData({ key: e.detail.value });
   },
@@ -55,7 +60,10 @@ Page({
     this.setData({ busy: true, message: "" });
     try {
       if (e.currentTarget.dataset.mode === "dev")
-        await developmentLogin(this.data.key.trim());
+        await developmentLogin(
+          this.data.key.trim(),
+          this.data.profileIndex === 1 ? "admin" : "member",
+        );
       else await wechatLogin();
       this.setData({ key: "" });
       resume(this.data.returnTo);

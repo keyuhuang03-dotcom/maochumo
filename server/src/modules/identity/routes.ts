@@ -3,7 +3,7 @@ import { FastifyInstance } from "fastify";
 import { config } from "../../config";
 import { db, rows, transaction } from "../../common/db";
 import { identity, tokenHash } from "../../common/auth";
-import { ApiError, ok, pending } from "../../common/http";
+import { ApiError, ok } from "../../common/http";
 import { User } from "../../../../contracts";
 import { wechat } from "./wechat";
 export async function identityRoutes(app: FastifyInstance) {
@@ -98,8 +98,5 @@ export async function identityRoutes(app: FastifyInstance) {
     },
   );
   app.get("/api/v1/me", async (r) => ok(r, await identity(r)));
-  app.put("/api/v1/me", async (r) => {
-    await identity(r);
-    return pending();
-  });
+
 }
