@@ -1,1 +1,19 @@
-<view class="page"><view class="title">{{title}}</view><view class="notice">开发占位 · {{owner}}负责。功能尚未实现，接口状态和任务见仓库任务卡。</view><view wx:if="{{catId}}">猫咪编号：{{catId}}</view><button bindtap="back">返回</button></view>
+<view class="page"><view class="title">{{title}}</view>
+<view wx:if="{{!admin}}" class="notice">需要管理员权限。请以管理员账号登录后从「我的」进入。</view>
+<block wx:else>
+<view class="notice">管理列表包含启用和停用话题，公开列表仅显示启用话题。</view>
+<view class="section-title">话题列表</view>
+<view wx:if="{{!topics.length}}" class="notice">暂无话题。</view>
+<view class="card" wx:for="{{topics}}" wx:key="id"><view># {{item.name}}</view><view class="muted">版本 {{item.version}} · {{item.status === "active" ? "启用" : "停用"}}</view><button class="text-button" data-id="{{item.id}}" bindtap="edit" disabled="{{busy}}">编辑此话题</button></view>
+<view class="section-title">{{editingId ? '编辑话题' : '新增话题'}}</view>
+<button wx:if="{{editingId}}" class="text-button" bindtap="newDraft" disabled="{{busy}}">改为新增</button>
+<view class="muted">话题名称（数据库唯一）</view>
+<input value="{{form.name}}" bindinput="fieldInput" placeholder="例如 校园日常" disabled="{{busy}}"/>
+<view class="muted">状态</view>
+<picker range="{{statusNames}}" value="{{statusIndex}}" bindchange="statusChange" disabled="{{busy}}"><view class="card">{{statusNames[statusIndex]}}</view></picker>
+<view class="notice" aria-live="polite">{{message}}</view>
+<button wx:if="{{conflict}}" bindtap="refreshCurrent" disabled="{{busy}}">载入最新版本</button>
+<button class="primary" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{editingId ? '保存修改（版本 ' + editingVersion + '）' : '新增话题'}}</button>
+<button bindtap="back">返回</button>
+</block>
+</view>

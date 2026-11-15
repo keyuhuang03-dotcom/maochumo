@@ -23,7 +23,8 @@
     "format": "prettier --write \"server/**/*.ts\" \"miniprogram/**/*.ts\" \"contracts/*.{ts,json,md}\" \"scripts/*.mjs\" \"docs/*.md\" \"*.{json,md,yaml}\" \".github/**/*.yml\"",
     "start:demo": "node scripts/start-demo.mjs",
     "test:owner-pages": "node scripts/test-owner-pages.mjs",
-    "debug:server": "node --inspect=127.0.0.1:9229 --import tsx server/src/index.ts"
+    "debug:server": "node --inspect=127.0.0.1:9229 --import tsx server/src/index.ts",
+    "test:abc-pages": "node scripts/test-abc-pages.mjs"
   },
   "dependencies": {
     "@fastify/multipart": "10.1.8",

@@ -2,6 +2,6 @@
 <view class="notice" wx:if="{{checking}}">正在检查登录服务…</view>
 <button wx:if="{{wechatAvailable}}" class="primary" data-mode="wechat" bindtap="login" loading="{{busy}}" disabled="{{busy || checking}}">微信登录</button>
 <view class="notice" wx:elif="{{!checking}}">当前未配置微信登录，请使用本地开发身份测试。</view>
-<view wx:if="{{devAvailable}}"><view class="notice">本机开发身份，仅用于演示。填写本机.env中 DEV_LOGIN_KEY 等号后面的口令。</view><input class="login-key" password value="{{key}}" bindinput="keyInput" placeholder="粘贴本机开发口令"/><button class="primary" data-mode="dev" bindtap="login" disabled="{{busy || checking}}" loading="{{busy}}">开发身份登录</button></view>
+<view wx:if="{{devAvailable}}"><view class="notice">本机开发身份，仅用于演示。填写本机.env中 DEV_LOGIN_KEY 等号后面的口令。</view><picker range="{{profiles}}" value="{{profileIndex}}" bindchange="profileChange" disabled="{{busy}}"><view class="notice">开发演示身份：{{profiles[profileIndex]}}（非真实微信认证）</view></picker><input class="login-key" password value="{{key}}" bindinput="keyInput" placeholder="粘贴本机开发口令"/><button class="primary" data-mode="dev" bindtap="login" disabled="{{busy || checking}}" loading="{{busy}}">开发身份登录</button></view>
 <view class="notice" wx:if="{{!checking && !wechatAvailable && !devAvailable}}">请先在电脑启动本地Demo服务，再刷新登录选项。</view>
 <view class="notice" aria-live="polite">{{message}}</view><button bindtap="checkCapabilities" disabled="{{checking || busy}}">刷新登录选项</button><button bindtap="back">返回</button></view>

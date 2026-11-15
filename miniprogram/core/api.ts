@@ -18,6 +18,10 @@ export const api = {
     request<PageResult<Post>>(
       "/api/v1/posts?" + query({ page, pageSize: 20, q, topicId }),
     ),
+  catPosts: (catId: string, page = 1) =>
+    request<PageResult<Post>>(
+      "/api/v1/posts?" + query({ catId, page, pageSize: 20 }),
+    ),
   post: (id: string) =>
     request<Post>("/api/v1/posts/" + encodeURIComponent(id)),
   hot: () => request<{ items: Post[]; asOf: string }>("/api/v1/posts/hot"),

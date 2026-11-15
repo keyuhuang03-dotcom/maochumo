@@ -1,27 +1,27 @@
 import { back, go } from "../../../core/routes";
+import { isAdmin, isLoggedIn } from "../access";
 Page({
   data: {
     title: "管理员工作台",
-    owner: "成员 C",
-    id: "",
-    catId: "",
-    postId: "",
-    areaId: "",
-    commentId: "",
+    loggedIn: false,
+    admin: false,
+    ready: false,
   },
-  onLoad(options) {
+  onShow() {
     this.setData({
-      id: options.id || "",
-      catId: options.catId || "",
-      postId: options.postId || "",
-      areaId: options.areaId || "",
-      commentId: options.commentId || "",
+      loggedIn: isLoggedIn(),
+      admin: isAdmin(),
+      ready: true,
     });
+  },
+  login() {
+    go("login");
+  },
+  open(e: WechatMiniprogram.TouchEvent) {
+    if (!this.data.admin) return;
+    go(e.currentTarget.dataset.route);
   },
   back() {
     back("account");
-  },
-  open(e: WechatMiniprogram.TouchEvent) {
-    go(e.currentTarget.dataset.route);
   },
 });

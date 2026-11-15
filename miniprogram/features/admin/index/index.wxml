@@ -1,1 +1,13 @@
-<view class="page"><view class="title">{{title}}</view><view class="notice">开发占位 · {{owner}}负责。功能尚未实现，接口状态和任务见仓库任务卡。</view><view wx:if="{{catId}}">猫咪编号：{{catId}}</view><button bindtap="open" data-route="adminCats">猫咪维护</button><button bindtap="open" data-route="adminAreas">区域维护</button><button bindtap="open" data-route="adminTopics">话题维护</button><button bindtap="open" data-route="adminPosts">隐藏帖子</button><button bindtap="back">返回</button></view>
+<view class="page"><view class="title">{{title}}</view>
+<view wx:if="{{!ready}}" class="notice">正在检查管理员身份…</view>
+<view wx:elif="{{!loggedIn}}" class="notice">请先登录管理员账号。</view>
+<button wx:if="{{!loggedIn}}" class="primary" bindtap="login">去登录</button>
+<view wx:elif="{{!admin}}" class="notice">当前账号不是管理员，无法进入管理功能。客户端角色不会改变服务端权限。</view>
+<block wx:else><view class="notice">管理操作会写入操作日志；写接口使用幂等标识并要求最新版本。</view>
+<button bindtap="open" data-route="adminCats">猫咪档案维护</button>
+<button bindtap="open" data-route="adminAreas">活动区域维护</button>
+<button bindtap="open" data-route="adminTopics">话题维护</button>
+<button bindtap="open" data-route="adminPosts">隐藏帖子</button>
+</block>
+<button bindtap="back">返回</button>
+</view>

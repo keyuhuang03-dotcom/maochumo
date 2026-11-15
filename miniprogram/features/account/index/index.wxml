@@ -1,1 +1,18 @@
-<view class="page"><view class="title">{{nickname}}</view><view class="notice">个人中心基础入口 · 成员 B 待接入业务</view><button wx:if="{{!loggedIn}}" bindtap="open" data-route="login">登录</button><button bindtap="open" data-route="settings">资料设置</button><button bindtap="open" data-route="posts">我的发布</button><button bindtap="open" data-route="likes">我的点赞</button><button bindtap="open" data-route="messages">消息</button><button wx:if="{{admin}}" bindtap="open" data-route="admin">管理员工作台</button></view>
+<view class="container">
+  <view wx:if="{{user}}" class="user-card">
+    <view class="nickname">{{user.nickname}}</view>
+    <image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" style="width:100rpx;height:100rpx;border-radius:50%"/>
+  </view>
+  <button wx:if="{{!loggedIn}}" bindtap="login">登录猫出没</button>
+  <view class="notice">{{message}}</view>
+  <view class="menu-list">
+    <view class="menu-item" bindtap="gotoMessages">
+      <text>消息通知</text>
+      <view wx:if="{{unreadCount > 0}}" class="badge">{{unreadCount}}</view>
+    </view>
+    <view class="menu-item" bindtap="gotoPosts">我的发布</view>
+    <view class="menu-item" bindtap="gotoLikes">我的点赞</view>
+    <view class="menu-item" bindtap="gotoSettings">资料设置</view>
+    <view wx:if="{{admin}}" class="menu-item" data-route="admin" bindtap="open">管理员工作台</view>
+  </view>
+</view>

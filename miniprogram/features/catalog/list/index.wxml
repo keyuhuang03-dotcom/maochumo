@@ -1,1 +1,28 @@
-<view class="page"><view class="title">{{title}}</view><view class="notice">开发占位 · {{owner}}负责。功能尚未实现，接口状态和任务见仓库任务卡。</view><view wx:if="{{catId}}">猫咪编号：{{catId}}</view><button bindtap="open" data-route="cat">档案页面占位</button><button bindtap="back">返回</button></view>
+<view class="container">
+  <view class="filter-bar">
+    <input class="search-input" placeholder="搜索猫咪名字或别名" value="{{q}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+    <picker bindchange="onAreaChange" range="{{areaList}}" range-key="name">
+      <!-- 注意这里：只用一个变量 currentAreaName 显示，不要写 findIndex -->
+      <view class="area-picker">{{currentAreaName || '全部区域'}} ▼</view>
+    </picker>
+    <view class="clear-btn" bindtap="clearFilter">清空</view>
+  </view>
+
+  <view-state
+    state="{{viewState}}"
+    message="{{viewMessage}}"
+    bind:retry="onRetry"
+  />
+
+  <view class="cat-list" wx:if="{{viewState === 'idle'}}">
+    <cat-card
+      wx:for="{{catList}}"
+      wx:key="id"
+      cat="{{item}}"
+      bind:open="onTapCatCard"
+    />
+  </view>
+
+  <view wx:if="{{loading && catList.length > 0}}" class="load-more">加载更多...</view>
+  <view wx:if="{{!hasMore && catList.length > 0}}" class="load-more">没有更多啦</view>
+</view>
