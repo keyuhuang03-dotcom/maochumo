@@ -1,18 +1,15 @@
-<view class="container">
-  <view wx:if="{{user}}" class="user-card">
-    <view class="nickname">{{user.nickname}}</view>
-    <image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" style="width:100rpx;height:100rpx;border-radius:50%"/>
-  </view>
-  <button wx:if="{{!loggedIn}}" bindtap="login">登录猫出没</button>
-  <view class="notice">{{message}}</view>
+<ui-header title="我的"/>
+<view class="account-page">
+  <button class="profile" bindtap="profile" aria-label="{{loggedIn ? '查看和设置个人资料' : '登录猫出没'}}">
+    <view class="avatar"><image wx:if="{{avatarUrl && !avatarFailed}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" binderror="avatarError"/><text wx:else class="avatar-letter">我</text></view>
+    <view class="profile-copy"><view class="nickname">{{loggedIn ? (user.nickname || '猫出没同学') : '登录猫出没'}}</view><view class="profile-caption">{{loggedIn ? '已登录 · 点击设置个人资料' : '登录后查看消息和互动记录'}}</view></view>
+  </button>
+  <view wx:if="{{message}}" class="account-error" aria-live="polite">{{message}}<button class="retry" bindtap="refresh">重新加载</button></view>
   <view class="menu-list">
-    <view class="menu-item" bindtap="gotoMessages">
-      <text>消息通知</text>
-      <view wx:if="{{unreadCount > 0}}" class="badge">{{unreadCount}}</view>
-    </view>
-    <view class="menu-item" bindtap="gotoPosts">我的发布</view>
-    <view class="menu-item" bindtap="gotoLikes">我的点赞</view>
-    <view class="menu-item" bindtap="gotoSettings">资料设置</view>
-    <view wx:if="{{admin}}" class="menu-item" data-route="admin" bindtap="open">管理员工作台</view>
+    <button class="menu-item" bindtap="gotoMessages"><view class="menu-copy"><view class="menu-title">消息通知<text wx:if="{{unreadCount > 0}}" class="unread">{{unreadCount > 99 ? '99+' : unreadCount}}</text></view><view class="menu-caption">查看评论和回复</view></view><image class="menu-arrow" src="/assets/ui/right-green.png"/></button>
+    <button class="menu-item" bindtap="gotoPosts"><view class="menu-copy"><view class="menu-title">我发布的帖子</view><view class="menu-caption">支持删除，暂不支持修改</view></view><image class="menu-arrow" src="/assets/ui/right-green.png"/></button>
+    <button class="menu-item" bindtap="gotoLikes"><view class="menu-copy"><view class="menu-title">我点赞的帖子</view><view class="menu-caption">浏览我的点赞记录</view></view><image class="menu-arrow" src="/assets/ui/right-green.png"/></button>
+    <button class="menu-item" bindtap="profile"><view class="menu-copy"><view class="menu-title">{{loggedIn ? '资料设置 / 切换账号' : '登录猫出没'}}</view><view class="menu-caption">{{loggedIn ? '设置头像昵称，或退出当前账号' : '登录后设置头像和昵称'}}</view></view><image class="menu-arrow" src="/assets/ui/right-green.png"/></button>
+    <button wx:if="{{loggedIn && admin}}" class="menu-item" data-route="admin" bindtap="open"><view class="menu-copy"><view class="menu-title">管理员工作台</view><view class="menu-caption">维护猫咪、区域、话题和帖子</view></view><image class="menu-arrow" src="/assets/ui/right-green.png"/></button>
   </view>
 </view>
