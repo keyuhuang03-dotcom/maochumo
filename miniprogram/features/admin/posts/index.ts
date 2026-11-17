@@ -1,3 +1,5 @@
+import { getSession } from "../../../core/session";
+import { pendingAdmin, submitAdmin, pendingMessage } from "../submission";
 import type { HidePost, Post } from "../../../../contracts/index";
 import { errorMessage } from "../../../core/request";
 import { requestKey } from "../../../core/submission";
@@ -15,23 +17,44 @@ Page({
     page: 1,
     hasMore: false,
     busy: false,
+    pending: false,
     message: "",
     selectedId: "",
     reason: "",
   },
   requestKeyValue: "",
   initialized: false,
+  actorId: "",
   loadGeneration: 0,
   loadingList: false,
   onShow() {
+    const actorId = getSession()?.user.id || "";
+    if (actorId !== this.actorId) {
+      this.actorId = actorId;
+      this.initialized = false;
+      this.setData({ busy: false, pending: false });
+    }
     if (!isAdmin()) {
       this.setData({ admin: false, ready: true });
       return;
     }
     this.setData({ admin: true });
+    const pending = pendingAdmin<HidePost>("posts");
+    this.setData({ pending: !!pending });
+    if (pending) {
+      this.requestKeyValue = pending.input.requestKey;
+      this.setData({
+        selectedId: pending.id,
+        reason: pending.input.reason || "",
+        message: pendingMessage,
+      });
+    }
     if (!this.initialized) {
       this.initialized = true;
-      this.requestKeyValue = requestKey();
+      if (!pending) {
+        this.requestKeyValue = requestKey();
+        this.setData({ selectedId: "", reason: "", message: "" });
+      }
     }
     void this.load();
   },
@@ -69,11 +92,12 @@ Page({
     this.setData({ keyword: e.detail.value });
   },
   search() {
+    if (this.data.busy || this.data.pending) return;
     this.setData({ busy: true, message: "", selectedId: "" });
     void this.load().then(() => this.setData({ busy: false }));
   },
   select(e: WechatMiniprogram.TouchEvent) {
-    if (this.data.busy) return;
+    if (this.data.busy || this.data.pending) return;
     this.requestKeyValue = requestKey();
     this.setData({
       selectedId: e.currentTarget.dataset.id,
@@ -82,10 +106,11 @@ Page({
     });
   },
   cancel() {
-    if (this.data.busy) return;
+    if (this.data.busy || this.data.pending) return;
     this.setData({ selectedId: "", reason: "", message: "" });
   },
   reasonInput(e: WechatMiniprogram.Input) {
+    if (this.data.busy || this.data.pending) return;
     this.setData({ reason: e.detail.value });
   },
   async confirm() {
@@ -109,19 +134,25 @@ Page({
     };
     this.setData({ busy: true, message: "" });
     try {
-      await adminApi.hidePost(postId, input);
+      await submitAdmin("posts", postId, input, (id, payload) =>
+        adminApi.hidePost(id, payload),
+      );
       this.requestKeyValue = requestKey();
       this.setData({
         busy: false,
+        pending: false,
         selectedId: "",
         reason: "",
         message: "已隐藏帖子 " + postId,
       });
       await this.load();
     } catch (e) {
+      const pending = !!pendingAdmin("posts");
+      if (!pending) this.requestKeyValue = requestKey();
       this.setData({
         busy: false,
-        message: errorMessage(e),
+        pending,
+        message: pending ? pendingMessage : errorMessage(e),
       });
     }
   },

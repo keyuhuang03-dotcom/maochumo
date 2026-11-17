@@ -4,22 +4,22 @@
 <view class="notice">区域范围使用地图单位坐标 0—1；保存时使用版本乐观锁。</view>
 <view class="section-title">区域列表</view>
 <view wx:if="{{!areas.length}}" class="notice">暂无活动区域。</view>
-<view class="card" wx:for="{{areas}}" wx:key="id"><view>{{item.name}}</view><view class="muted">x {{item.region.x}} · y {{item.region.y}} · 宽 {{item.region.width}} · 高 {{item.region.height}}</view><view class="muted">版本 {{item.version}}</view><button class="text-button" data-id="{{item.id}}" bindtap="edit" disabled="{{busy}}">编辑此区域</button></view>
+<view class="card" wx:for="{{areas}}" wx:key="id"><view>{{item.name}}</view><view class="muted">x {{item.region.x}} · y {{item.region.y}} · 宽 {{item.region.width}} · 高 {{item.region.height}}</view><view class="muted">版本 {{item.version}}</view><button class="text-button" data-id="{{item.id}}" bindtap="edit" disabled="{{busy || pending}}">编辑此区域</button></view>
 <view class="section-title">{{editingId ? '编辑区域' : '新增区域'}}</view>
-<button wx:if="{{editingId}}" class="text-button" bindtap="newDraft" disabled="{{busy}}">改为新增</button>
+<button wx:if="{{editingId}}" class="text-button" bindtap="newDraft" disabled="{{busy || pending}}">改为新增</button>
 <view class="muted">区域名称</view>
-<input value="{{form.name}}" data-field="name" bindinput="fieldInput" placeholder="例如 图书馆北门" disabled="{{busy}}"/>
+<input value="{{form.name}}" data-field="name" bindinput="fieldInput" placeholder="例如 图书馆北门" disabled="{{busy || pending}}"/>
 <view class="muted">x</view>
-<input type="digit" value="{{form.x}}" data-field="x" bindinput="fieldInput" disabled="{{busy}}"/>
+<input type="digit" value="{{form.x}}" data-field="x" bindinput="fieldInput" disabled="{{busy || pending}}"/>
 <view class="muted">y</view>
-<input type="digit" value="{{form.y}}" data-field="y" bindinput="fieldInput" disabled="{{busy}}"/>
+<input type="digit" value="{{form.y}}" data-field="y" bindinput="fieldInput" disabled="{{busy || pending}}"/>
 <view class="muted">宽度</view>
-<input type="digit" value="{{form.width}}" data-field="width" bindinput="fieldInput" disabled="{{busy}}"/>
+<input type="digit" value="{{form.width}}" data-field="width" bindinput="fieldInput" disabled="{{busy || pending}}"/>
 <view class="muted">高度</view>
-<input type="digit" value="{{form.height}}" data-field="height" bindinput="fieldInput" disabled="{{busy}}"/>
-<view class="notice" aria-live="polite">{{message}}</view>
-<button wx:if="{{conflict}}" bindtap="refreshCurrent" disabled="{{busy}}">载入最新版本</button>
-<button class="primary" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{editingId ? '保存修改（版本 ' + editingVersion + '）' : '新增区域'}}</button>
+<input type="digit" value="{{form.height}}" data-field="height" bindinput="fieldInput" disabled="{{busy || pending}}"/>
+<view class="notice" aria-live="polite">{{message}}</view><view class="notice" wx:if="{{pending}}">结果待确认，请使用保存按钮重试原请求。</view>
+<button wx:if="{{conflict}}" bindtap="refreshCurrent" disabled="{{busy || pending}}">载入最新版本</button>
+<button class="primary" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{pending ? '重试确认原请求' : editingId ? '保存修改（版本 ' + editingVersion + '）' : '新增区域'}}</button>
 <button bindtap="back">返回</button>
 </block>
 </view>

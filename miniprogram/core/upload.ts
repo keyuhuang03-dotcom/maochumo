@@ -1,5 +1,5 @@
 import type { ApiResult, UploadResult } from "../../contracts/index";
-import { getSession, clearSession } from "./session";
+import { getSession, clearSessionIfCurrent } from "./session";
 import { env } from "./env";
 import { RequestError } from "./request";
 export function uploadImage(
@@ -17,7 +17,7 @@ export function uploadImage(
       timeout: 30000,
       header: { Authorization: "Bearer " + token },
       success(response) {
-        if (response.statusCode === 401) clearSession();
+        if (response.statusCode === 401) clearSessionIfCurrent(token);
         try {
           const result = JSON.parse(response.data) as ApiResult<UploadResult>;
           if (

@@ -1,3 +1,5 @@
+import { getSession } from "../../../core/session";
+import { pendingAdmin, submitAdmin, pendingMessage } from "../submission";
 import type {
   CreateTopic,
   Ref,
@@ -28,17 +30,26 @@ Page({
     editingId: "",
     editingVersion: 0,
     busy: false,
+    pending: false,
     message: "",
     conflict: false,
   },
   requestKeyValue: "",
   initialized: false,
+  actorId: "",
   onShow() {
+    const actorId = getSession()?.user.id || "";
+    if (actorId !== this.actorId) {
+      this.actorId = actorId;
+      this.initialized = false;
+      this.setData({ busy: false, pending: false });
+    }
     if (!isAdmin()) {
       this.setData({ admin: false, ready: true });
       return;
     }
     this.setData({ admin: true });
+    this.restorePending();
     if (!this.initialized) {
       this.initialized = true;
       this.newDraft();
@@ -48,7 +59,23 @@ Page({
   onUnload() {
     this.initialized = false;
   },
+  restorePending() {
+    const item = pendingAdmin<CreateTopic | UpdateTopic>("topics");
+    this.setData({ pending: !!item });
+    if (item) {
+      const input = item.input;
+      this.requestKeyValue = input.requestKey;
+      this.setData({
+        editingId: item.id,
+        editingVersion: "version" in input ? input.version : 0,
+        form: { name: input.name, status: input.status },
+        statusIndex: statuses.indexOf(input.status),
+      });
+      this.setData({ message: pendingMessage });
+    }
+  },
   newDraft() {
+    if (this.data.busy || this.data.pending) return;
     this.requestKeyValue = requestKey();
     this.setData({
       editingId: "",
@@ -68,9 +95,11 @@ Page({
     }
   },
   fieldInput(e: WechatMiniprogram.Input) {
+    if (this.data.busy || this.data.pending) return;
     this.setData({ form: { ...this.data.form, name: e.detail.value } });
   },
   statusChange(e: WechatMiniprogram.PickerChange) {
+    if (this.data.busy || this.data.pending) return;
     const index = Number(e.detail.value);
     this.setData({
       statusIndex: index,
@@ -78,6 +107,7 @@ Page({
     });
   },
   edit(e: WechatMiniprogram.TouchEvent) {
+    if (this.data.busy || this.data.pending) return;
     const topic = this.data.topics.find(
       (t) => t.id === e.currentTarget.dataset.id,
     );
@@ -93,6 +123,7 @@ Page({
     });
   },
   async refreshCurrent() {
+    if (this.data.busy || this.data.pending) return;
     try {
       const result = await adminApi.topics();
       const topic = result.items.find((t) => t.id === this.data.editingId);
@@ -127,16 +158,19 @@ Page({
         status: this.data.form.status,
         requestKey: this.requestKeyValue,
       };
-      let saved: Topic;
-      if (this.data.editingId) {
-        const payload: UpdateTopic = {
-          ...base,
-          version: this.data.editingVersion,
-        };
-        saved = await adminApi.updateTopic(this.data.editingId, payload);
-      } else {
-        saved = await adminApi.createTopic(base);
-      }
+      const input: CreateTopic | UpdateTopic = this.data.editingId
+        ? { ...base, version: this.data.editingVersion }
+        : base;
+      const saved = await submitAdmin(
+        "topics",
+        this.data.editingId,
+        input,
+        (id, payload) =>
+          id
+            ? adminApi.updateTopic(id, payload as UpdateTopic)
+            : adminApi.createTopic(payload),
+      );
+      this.setData({ pending: false });
       this.requestKeyValue = requestKey();
       this.setData({
         editingId: saved.id,
@@ -151,6 +185,9 @@ Page({
       });
       await this.load();
     } catch (e) {
+      const pending = !!pendingAdmin("topics");
+      this.setData({ pending });
+      if (!pending) this.requestKeyValue = requestKey();
       const conflict =
         e instanceof RequestError && e.code === "VERSION_CONFLICT";
       this.setData({
@@ -158,7 +195,9 @@ Page({
         conflict,
         message: conflict
           ? "该话题已被其他人修改，请载入最新版本后重试"
-          : errorMessage(e),
+          : pending
+            ? pendingMessage
+            : errorMessage(e),
       });
     }
   },

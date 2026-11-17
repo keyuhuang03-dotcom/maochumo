@@ -17,14 +17,15 @@
     "db:seed": "tsx server/seeds/demo.ts",
     "test": "tsx --test server/tests/*.test.ts",
     "test:page": "node scripts/test-page.mjs",
-    "check": "npm run typecheck && npm run build && npm test",
+    "check": "npm run typecheck && npm run build && npm test && npm run test:regressions",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "format": "prettier --write \"server/**/*.ts\" \"miniprogram/**/*.ts\" \"contracts/*.{ts,json,md}\" \"scripts/*.mjs\" \"docs/*.md\" \"*.{json,md,yaml}\" \".github/**/*.yml\"",
     "start:demo": "node scripts/start-demo.mjs",
     "test:owner-pages": "node scripts/test-owner-pages.mjs",
     "debug:server": "node --inspect=127.0.0.1:9229 --import tsx server/src/index.ts",
-    "test:abc-pages": "node scripts/test-abc-pages.mjs"
+    "test:abc-pages": "node scripts/test-abc-pages.mjs",
+    "test:regressions": "node scripts/test-regressions.mjs"
   },
   "dependencies": {
     "@fastify/multipart": "10.1.8",

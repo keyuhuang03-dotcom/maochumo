@@ -3,32 +3,32 @@
 <block wx:else>
 <view class="notice">猫咪名称允许重名，编辑按 ID 定位；版本冲突时会提示重新载入。</view>
 <input placeholder="搜索名称或别名" value="{{keyword}}" bindinput="searchInput" bindconfirm="search"/>
-<button bindtap="search" disabled="{{busy}}">搜索</button>
+<button bindtap="search" disabled="{{busy || pending}}">搜索</button>
 <view class="section-title">档案列表</view>
 <view wx:if="{{!cats.length}}" class="notice">暂无猫咪档案。</view>
-<view class="card" wx:for="{{cats}}" wx:key="id"><view>{{item.name}} · {{item.areaName}}</view><view class="muted">版本 {{item.version}}<text wx:if="{{item.aliasText}}"> · 别名 {{item.aliasText}}</text></view><button class="text-button" data-id="{{item.id}}" bindtap="edit" disabled="{{busy}}">编辑此档案</button></view>
-<button wx:if="{{hasMore}}" bindtap="more" disabled="{{busy}}">加载更多</button>
+<view class="card" wx:for="{{cats}}" wx:key="id"><view>{{item.name}} · {{item.areaName}}</view><view class="muted">版本 {{item.version}}<text wx:if="{{item.aliasText}}"> · 别名 {{item.aliasText}}</text></view><button class="text-button" data-id="{{item.id}}" bindtap="edit" disabled="{{busy || pending}}">编辑此档案</button></view>
+<button wx:if="{{hasMore}}" bindtap="more" disabled="{{busy || pending}}">加载更多</button>
 <view class="section-title">{{editingId ? '编辑档案' : '新增档案'}}</view>
-<button wx:if="{{editingId}}" class="text-button" bindtap="newDraft" disabled="{{busy}}">改为新增</button>
+<button wx:if="{{editingId}}" class="text-button" bindtap="newDraft" disabled="{{busy || pending}}">改为新增</button>
 <view class="muted">猫咪名称</view>
-<input value="{{form.name}}" data-field="name" bindinput="fieldInput" placeholder="例如 橘子" disabled="{{busy}}"/>
+<input value="{{form.name}}" data-field="name" bindinput="fieldInput" placeholder="例如 橘子" disabled="{{busy || pending}}"/>
 <view class="muted">主要活动区域</view>
-<picker range="{{areaNames}}" value="{{areaIndex}}" bindchange="areaChange" disabled="{{busy}}"><view class="card">{{areaNames[areaIndex] || '请选择区域'}}</view></picker>
+<picker range="{{areaNames}}" value="{{areaIndex}}" bindchange="areaChange" disabled="{{busy || pending}}"><view class="card">{{areaNames[areaIndex] || '请选择区域'}}</view></picker>
 <view class="muted">性别</view>
-<picker range="{{sexNames}}" value="{{sexIndex}}" bindchange="sexChange" disabled="{{busy}}"><view class="card">{{sexNames[sexIndex]}}</view></picker>
+<picker range="{{sexNames}}" value="{{sexIndex}}" bindchange="sexChange" disabled="{{busy || pending}}"><view class="card">{{sexNames[sexIndex]}}</view></picker>
 <view class="muted">别名（用逗号分隔）</view>
-<input value="{{form.aliases}}" data-field="aliases" bindinput="fieldInput" disabled="{{busy}}"/>
+<input value="{{form.aliases}}" data-field="aliases" bindinput="fieldInput" disabled="{{busy || pending}}"/>
 <view class="muted">外貌</view>
-<textarea value="{{form.appearance}}" data-field="appearance" bindinput="fieldInput" maxlength="1000" disabled="{{busy}}"/>
+<textarea value="{{form.appearance}}" data-field="appearance" bindinput="fieldInput" maxlength="1000" disabled="{{busy || pending}}"/>
 <view class="muted">性格</view>
-<textarea value="{{form.personality}}" data-field="personality" bindinput="fieldInput" maxlength="1000" disabled="{{busy}}"/>
+<textarea value="{{form.personality}}" data-field="personality" bindinput="fieldInput" maxlength="1000" disabled="{{busy || pending}}"/>
 <view class="section-title">猫咪照片</view>
 <view class="notice">照片会真实上传并通过服务端校验，未上传成功不会保存。</view>
-<view class="draft-photos"><view class="draft-photo" wx:for="{{photos}}" wx:key="path"><image src="{{item.path}}" mode="aspectFill" data-path="{{item.path}}" bindtap="preview"/><button class="remove-image" data-index="{{index}}" bindtap="removePhoto" disabled="{{busy}}">移除</button></view></view>
+<view class="draft-photos"><view class="draft-photo" wx:for="{{photos}}" wx:key="path"><image src="{{item.path}}" mode="aspectFill" data-path="{{item.path}}" bindtap="preview"/><button class="remove-image" data-index="{{index}}" bindtap="removePhoto" disabled="{{busy || pending}}">移除</button></view></view>
 <button bindtap="choosePhotos" disabled="{{busy || photos.length >= 9}}">添加图片（{{photos.length}}/9）</button>
-<view class="notice" aria-live="polite">{{message}}</view>
-<button wx:if="{{conflict}}" bindtap="refreshCurrent" disabled="{{busy}}">载入最新版本</button>
-<button class="primary" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{editingId ? '保存修改（版本 ' + editingVersion + '）' : '新增猫咪'}}</button>
+<view class="notice" aria-live="polite">{{message}}</view><view class="notice" wx:if="{{pending}}">结果待确认，请使用保存按钮重试原请求。</view>
+<button wx:if="{{conflict}}" bindtap="refreshCurrent" disabled="{{busy || pending}}">载入最新版本</button>
+<button class="primary" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{pending ? '重试确认原请求' : editingId ? '保存修改（版本 ' + editingVersion + '）' : '新增猫咪'}}</button>
 <button bindtap="back">返回</button>
 </block>
 </view>

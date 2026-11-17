@@ -3,13 +3,13 @@
 <block wx:else>
 <view class="notice">这里只查询公开可见的帖子；已隐藏帖子不会再出现在公开列表。隐藏操作会写入操作日志。</view>
 <input placeholder="搜索帖子正文或标签" value="{{keyword}}" bindinput="searchInput" bindconfirm="search"/>
-<button bindtap="search" disabled="{{busy}}">搜索</button>
+<button bindtap="search" disabled="{{busy || pending}}">搜索</button>
 <view wx:if="{{!posts.length}}" class="notice">没有匹配的公开帖子。</view>
-<view class="card" wx:for="{{posts}}" wx:key="id"><view>{{item.body || '（无正文）'}}</view><view class="muted">{{item.author.nickname || item.author.id}}</view><view class="muted">编号 {{item.id}}</view><view class="tag" wx:for="{{item.cats}}" wx:for-item="cat" wx:key="id"># {{cat.name}}</view><view class="tag" wx:for="{{item.topics}}" wx:for-item="topic" wx:key="id"># {{topic.name}}</view><button class="text-button" data-id="{{item.id}}" bindtap="select" disabled="{{busy}}">隐藏此帖</button></view>
-<button wx:if="{{hasMore}}" bindtap="more" disabled="{{busy}}">加载更多</button>
+<view class="card" wx:for="{{posts}}" wx:key="id"><view>{{item.body || '（无正文）'}}</view><view class="muted">{{item.author.nickname || item.author.id}}</view><view class="muted">编号 {{item.id}}</view><view class="tag" wx:for="{{item.cats}}" wx:for-item="cat" wx:key="id"># {{cat.name}}</view><view class="tag" wx:for="{{item.topics}}" wx:for-item="topic" wx:key="id"># {{topic.name}}</view><button class="text-button" data-id="{{item.id}}" bindtap="select" disabled="{{busy || pending}}">隐藏此帖</button></view>
+<button wx:if="{{hasMore}}" bindtap="more" disabled="{{busy || pending}}">加载更多</button>
 <view class="section-title" wx:if="{{selectedId}}">隐藏原因（选填）</view>
-<block wx:if="{{selectedId}}"><textarea value="{{reason}}" bindinput="reasonInput" maxlength="500" placeholder="可填写隐藏原因（选填，最多 500 字，将写入操作日志）" disabled="{{busy}}"/><button class="primary" bindtap="confirm" loading="{{busy}}" disabled="{{busy}}">确认隐藏</button><button class="text-button" bindtap="cancel" disabled="{{busy}}">取消选择</button></block>
-<view class="notice" aria-live="polite">{{message}}</view>
+<block wx:if="{{selectedId}}"><textarea value="{{reason}}" bindinput="reasonInput" maxlength="500" placeholder="可填写隐藏原因（选填，最多 500 字，将写入操作日志）" disabled="{{busy || pending}}"/><button class="primary" bindtap="confirm" loading="{{busy}}" disabled="{{busy}}">{{pending ? '重试确认原请求' : '确认隐藏'}}</button><button class="text-button" bindtap="cancel" disabled="{{busy || pending}}">取消选择</button></block>
+<view class="notice" aria-live="polite">{{message}}</view><view class="notice" wx:if="{{pending}}">结果待确认，请使用保存按钮重试原请求。</view>
 <button bindtap="back">返回</button>
 </block>
 </view>

@@ -124,6 +124,25 @@ try {
   assert.equal(areaCount[0].n, 1);
   areaId = areas.data.editingId;
   assert(areaId, areas.data.message);
+  areas.fieldInput({
+    currentTarget: { dataset: { field: "name" } },
+    detail: { value: prefix + " updated" },
+  });
+  losePath = "/admin/areas/" + areaId;
+  await areas.submit();
+  assert.equal(areas.data.pending, true);
+  areas.fieldInput({
+    currentTarget: { dataset: { field: "name" } },
+    detail: { value: "must not replace pending" },
+  });
+  assert.equal(areas.data.form.name, prefix + " updated");
+  await areas.submit();
+  assert.equal(areas.data.editingVersion, 2);
+  const [versionRows] = await db.execute(
+    "SELECT version FROM areas WHERE id=?",
+    [areaId],
+  );
+  assert.equal(versionRows[0].version, 2);
   const cats = page("admin/cats");
   cats.newDraft();
   await cats.load();
@@ -137,12 +156,18 @@ try {
       personality: "演示",
     },
   });
+  losePath = "/admin/cats";
+  await cats.submit();
+  assert.equal(cats.data.pending, true);
   await cats.submit();
   catId = cats.data.editingId;
   assert(catId, cats.data.message);
   const topics = page("admin/topics");
   topics.newDraft();
   topics.setData({ form: { name: prefix, status: "active" } });
+  losePath = "/admin/topics";
+  await topics.submit();
+  assert.equal(topics.data.pending, true);
   await topics.submit();
   topicId = topics.data.editingId;
   assert(topicId, topics.data.message);
@@ -244,6 +269,11 @@ try {
   const moderation = page("admin/posts");
   moderation.requestKeyValue = randomUUID();
   moderation.setData({ selectedId: postId, reason: "自动化联调" });
+  losePath = "/admin/posts/" + postId + "/hide";
+  await moderation.confirm();
+  assert.equal(moderation.data.pending, true);
+  moderation.reasonInput({ detail: { value: "must not replace pending" } });
+  assert.equal(moderation.data.reason, "自动化联调");
   await moderation.confirm();
   assert.equal(moderation.data.selectedId, "", moderation.data.message);
   login(0);
