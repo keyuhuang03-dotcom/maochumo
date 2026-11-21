@@ -4,16 +4,16 @@
 <view class="notice">管理列表包含启用和停用话题，公开列表仅显示启用话题。</view>
 <view class="section-title">话题列表</view>
 <view wx:if="{{!topics.length}}" class="notice">暂无话题。</view>
-<view class="card" wx:for="{{topics}}" wx:key="id"><view># {{item.name}}</view><view class="muted">版本 {{item.version}} · {{item.status === "active" ? "启用" : "停用"}}</view><button class="text-button" data-id="{{item.id}}" bindtap="edit" disabled="{{busy}}">编辑此话题</button></view>
+<view class="card" wx:for="{{topics}}" wx:key="id"><view># {{item.name}}</view><view class="muted">版本 {{item.version}} · {{item.status === "active" ? "启用" : "停用"}}</view><button class="text-button" data-id="{{item.id}}" bindtap="edit" disabled="{{busy || pending}}">编辑此话题</button></view>
 <view class="section-title">{{editingId ? '编辑话题' : '新增话题'}}</view>
-<button wx:if="{{editingId}}" class="text-button" bindtap="newDraft" disabled="{{busy}}">改为新增</button>
+<button wx:if="{{editingId}}" class="text-button" bindtap="newDraft" disabled="{{busy || pending}}">改为新增</button>
 <view class="muted">话题名称（数据库唯一）</view>
-<input value="{{form.name}}" bindinput="fieldInput" placeholder="例如 校园日常" disabled="{{busy}}"/>
+<input value="{{form.name}}" bindinput="fieldInput" placeholder="例如 校园日常" disabled="{{busy || pending}}"/>
 <view class="muted">状态</view>
-<picker range="{{statusNames}}" value="{{statusIndex}}" bindchange="statusChange" disabled="{{busy}}"><view class="card">{{statusNames[statusIndex]}}</view></picker>
-<view class="notice" aria-live="polite">{{message}}</view>
-<button wx:if="{{conflict}}" bindtap="refreshCurrent" disabled="{{busy}}">载入最新版本</button>
-<button class="primary" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{editingId ? '保存修改（版本 ' + editingVersion + '）' : '新增话题'}}</button>
+<picker range="{{statusNames}}" value="{{statusIndex}}" bindchange="statusChange" disabled="{{busy || pending}}"><view class="card">{{statusNames[statusIndex]}}</view></picker>
+<view class="notice" aria-live="polite">{{message}}</view><view class="notice" wx:if="{{pending}}">结果待确认，请使用保存按钮重试原请求。</view>
+<button wx:if="{{conflict}}" bindtap="refreshCurrent" disabled="{{busy || pending}}">载入最新版本</button>
+<button class="primary" bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{pending ? '重试确认原请求' : editingId ? '保存修改（版本 ' + editingVersion + '）' : '新增话题'}}</button>
 <button bindtap="back">返回</button>
 </block>
 </view>

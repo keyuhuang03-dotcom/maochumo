@@ -1,28 +1,10 @@
-<view class="container">
-  <view class="filter-bar">
-    <input class="search-input" placeholder="搜索猫咪名字或别名" value="{{q}}" bindinput="onSearchInput" bindconfirm="onSearch" />
-    <picker bindchange="onAreaChange" range="{{areaList}}" range-key="name">
-      <!-- 注意这里：只用一个变量 currentAreaName 显示，不要写 findIndex -->
-      <view class="area-picker">{{currentAreaName || '全部区域'}} ▼</view>
-    </picker>
-    <view class="clear-btn" bindtap="clearFilter">清空</view>
-  </view>
-
-  <view-state
-    state="{{viewState}}"
-    message="{{viewMessage}}"
-    bind:retry="onRetry"
-  />
-
-  <view class="cat-list" wx:if="{{viewState === 'idle'}}">
-    <cat-card
-      wx:for="{{catList}}"
-      wx:key="id"
-      cat="{{item}}"
-      bind:open="onTapCatCard"
-    />
-  </view>
-
-  <view wx:if="{{loading && catList.length > 0}}" class="load-more">加载更多...</view>
-  <view wx:if="{{!hasMore && catList.length > 0}}" class="load-more">没有更多啦</view>
+<ui-header title="猫咪图鉴"/>
+<view class="catalog-page">
+  <input class="search-input" placeholder="搜索猫咪名字或别名" placeholder-class="search-placeholder" value="{{q}}" bindinput="onSearchInput" bindconfirm="onSearch" confirm-type="search" maxlength="100"/>
+  <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}"><view class="area-tabs"><button class="area-tab {{!areaId ? 'selected' : ''}}" data-id="" bindtap="chooseArea" aria-label="全部区域">全部</button><button wx:for="{{areaList}}" wx:key="id" class="area-tab {{areaId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="chooseArea">{{item.name}}</button></view></scroll-view>
+  <button wx:if="{{q || areaId}}" class="clear-filter" bindtap="clearFilter">清除搜索和区域筛选</button>
+  <view wx:if="{{areaError}}" class="area-error">{{areaError}}<button class="retry-areas" bindtap="fetchAreaList">重试区域</button></view>
+  <view-state state="{{viewState}}" message="{{viewMessage}}" bind:retry="onRetry"/>
+  <view class="cat-list" wx:if="{{catList.length}}"><cat-card wx:for="{{catList}}" wx:key="id" cat="{{item}}" card caption="{{item.caption}}" bind:open="onTapCatCard"/></view>
+  <button wx:if="{{hasMore}}" class="load-more" bindtap="more" disabled="{{loading}}">{{loading ? '正在加载…' : '加载更多'}}</button>
 </view>

@@ -14,3 +14,7 @@ export function saveSession(session: Session) {
 export function clearSession() {
   wx.removeStorageSync(KEY);
 }
+
+export function clearSessionIfCurrent(token: string | undefined) {
+  if (getSession()?.token === token) clearSession();
+}

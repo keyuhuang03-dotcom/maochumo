@@ -1,3 +1,5 @@
+import { getSession } from "../../../core/session";
+import { pendingAdmin, submitAdmin, pendingMessage } from "../submission";
 import type {
   Area,
   Cat,
@@ -50,6 +52,7 @@ Page({
     editingId: "",
     editingVersion: 0,
     busy: false,
+    pending: false,
     message: "",
     conflict: false,
     keyword: "",
@@ -58,14 +61,22 @@ Page({
   },
   requestKeyValue: "",
   initialized: false,
+  actorId: "",
   loadGeneration: 0,
   loadingList: false,
   onShow() {
+    const actorId = getSession()?.user.id || "";
+    if (actorId !== this.actorId) {
+      this.actorId = actorId;
+      this.initialized = false;
+      this.setData({ busy: false, pending: false });
+    }
     if (!isAdmin()) {
       this.setData({ admin: false, ready: true });
       return;
     }
     this.setData({ admin: true });
+    this.restorePending();
     if (!this.initialized) {
       this.initialized = true;
       this.newDraft();
@@ -76,7 +87,34 @@ Page({
     this.loadGeneration++;
     this.initialized = false;
   },
+  restorePending() {
+    const item = pendingAdmin<CreateCat | UpdateCat>("cats");
+    this.setData({ pending: !!item });
+    if (item) {
+      const input = item.input;
+      this.requestKeyValue = input.requestKey;
+      this.setData({
+        editingId: item.id,
+        editingVersion: "version" in input ? input.version : 0,
+        form: {
+          name: input.name,
+          areaId: input.areaId,
+          aliases: input.aliases.join("，"),
+          sex: input.sex,
+          appearance: input.appearance || "",
+          personality: input.personality || "",
+        },
+        sexIndex: sexes.indexOf(input.sex),
+        photos: input.photoRefs.map((ref) => ({
+          path: mediaUrl(ref),
+          imageRef: ref,
+        })),
+      });
+      this.setData({ message: pendingMessage });
+    }
+  },
   newDraft() {
+    if (this.data.busy || this.data.pending) return;
     this.requestKeyValue = requestKey();
     this.setData({
       editingId: "",
@@ -141,10 +179,12 @@ Page({
     void this.load().then(() => this.setData({ busy: false }));
   },
   fieldInput(e: WechatMiniprogram.Input) {
+    if (this.data.busy || this.data.pending) return;
     const field = e.currentTarget.dataset.field as keyof FormState;
     this.setData({ form: { ...this.data.form, [field]: e.detail.value } });
   },
   areaChange(e: WechatMiniprogram.PickerChange) {
+    if (this.data.busy || this.data.pending) return;
     const index = Number(e.detail.value);
     const area = this.data.areas[index];
     if (area)
@@ -154,6 +194,7 @@ Page({
       });
   },
   sexChange(e: WechatMiniprogram.PickerChange) {
+    if (this.data.busy || this.data.pending) return;
     const index = Number(e.detail.value);
     this.setData({
       sexIndex: index,
@@ -161,6 +202,7 @@ Page({
     });
   },
   choosePhotos() {
+    if (this.data.busy || this.data.pending) return;
     if (this.data.busy || this.data.photos.length >= 9) return;
     wx.chooseMedia({
       count: 9 - this.data.photos.length,
@@ -180,7 +222,7 @@ Page({
     });
   },
   removePhoto(e: WechatMiniprogram.TouchEvent) {
-    if (this.data.busy) return;
+    if (this.data.busy || this.data.pending) return;
     const index = Number(e.currentTarget.dataset.index);
     this.setData({ photos: this.data.photos.filter((_, i) => i !== index) });
   },
@@ -193,9 +235,11 @@ Page({
     await this.loadCat(e.currentTarget.dataset.id as string);
   },
   async refreshCurrent() {
+    if (this.data.busy || this.data.pending) return;
     if (this.data.editingId) await this.loadCat(this.data.editingId);
   },
   async loadCat(id: string) {
+    if (this.data.busy || this.data.pending) return;
     this.setData({ busy: true, message: "", conflict: false });
     try {
       const cat = await adminApi.cat(id);
@@ -256,16 +300,19 @@ Page({
         personality: form.personality.trim() || null,
         requestKey: this.requestKeyValue,
       };
-      let saved: Cat;
-      if (this.data.editingId) {
-        const payload: UpdateCat = {
-          ...base,
-          version: this.data.editingVersion,
-        };
-        saved = await adminApi.updateCat(this.data.editingId, payload);
-      } else {
-        saved = await adminApi.createCat(base);
-      }
+      const input: CreateCat | UpdateCat = this.data.editingId
+        ? { ...base, version: this.data.editingVersion }
+        : base;
+      const saved = await submitAdmin(
+        "cats",
+        this.data.editingId,
+        input,
+        (id, payload) =>
+          id
+            ? adminApi.updateCat(id, payload as UpdateCat)
+            : adminApi.createCat(payload),
+      );
+      this.setData({ pending: false });
       this.requestKeyValue = requestKey();
       this.setData({
         editingId: saved.id,
@@ -286,6 +333,9 @@ Page({
       });
       await this.load();
     } catch (e) {
+      const pending = !!pendingAdmin("cats");
+      this.setData({ pending });
+      if (!pending) this.requestKeyValue = requestKey();
       const conflict =
         e instanceof RequestError && e.code === "VERSION_CONFLICT";
       this.setData({
@@ -293,7 +343,9 @@ Page({
         conflict,
         message: conflict
           ? "该档案已被其他人修改，请载入最新版本后重试"
-          : errorMessage(e),
+          : pending
+            ? pendingMessage
+            : errorMessage(e),
       });
     }
   },

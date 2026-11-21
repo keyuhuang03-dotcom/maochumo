@@ -140,3 +140,18 @@
 .actions .action:last-child {
   width: 180rpx !important;
 }
+
+.detail-card .tags {
+  gap: 14rpx;
+  margin-top: 34rpx;
+}
+.detail-card .tag-button {
+  width: auto !important;
+  max-width: 100% !important;
+  min-height: 52rpx;
+  padding: 10rpx 16rpx;
+  font-size: 22rpx;
+  font-weight: 400;
+  white-space: normal;
+  word-break: break-word;
+}

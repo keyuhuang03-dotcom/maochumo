@@ -1,6 +1,6 @@
 import type { ApiResult } from "../../contracts/index";
 import { env } from "./env";
-import { getSession, clearSession } from "./session";
+import { getSession, clearSessionIfCurrent } from "./session";
 export class RequestError extends Error {
   constructor(
     message: string,
@@ -28,7 +28,7 @@ export function request<T>(
       },
       success(response) {
         const result = response.data;
-        if (response.statusCode === 401) clearSession();
+        if (response.statusCode === 401) clearSessionIfCurrent(token);
         if (
           response.statusCode >= 200 &&
           response.statusCode < 300 &&

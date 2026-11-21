@@ -12,6 +12,7 @@ Page({
     unreadCount: 0,
     message: "",
     avatarUrl: "",
+    avatarFailed: false,
   },
   generation: 0,
   async onShow() {
@@ -23,7 +24,10 @@ Page({
       admin: s?.user.role === "admin",
       unreadCount: 0,
       message: "",
-      avatarUrl: "",
+      avatarUrl: s?.user.avatarRef
+        ? env.apiBase + "/api/v1/media/" + encodeURIComponent(s.user.avatarRef)
+        : "",
+      avatarFailed: false,
     });
     if (!s) return;
     try {
@@ -48,6 +52,16 @@ Page({
   },
   onHide() {
     this.generation++;
+  },
+  profile() {
+    if (getSession()) go("settings");
+    else this.login();
+  },
+  avatarError() {
+    this.setData({ avatarFailed: true });
+  },
+  refresh() {
+    void this.onShow();
   },
   open(e: WechatMiniprogram.TouchEvent) {
     go(e.currentTarget.dataset.route);

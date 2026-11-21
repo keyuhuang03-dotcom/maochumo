@@ -124,6 +124,25 @@ try {
   assert.equal(areaCount[0].n, 1);
   areaId = areas.data.editingId;
   assert(areaId, areas.data.message);
+  areas.fieldInput({
+    currentTarget: { dataset: { field: "name" } },
+    detail: { value: prefix + " updated" },
+  });
+  losePath = "/admin/areas/" + areaId;
+  await areas.submit();
+  assert.equal(areas.data.pending, true);
+  areas.fieldInput({
+    currentTarget: { dataset: { field: "name" } },
+    detail: { value: "must not replace pending" },
+  });
+  assert.equal(areas.data.form.name, prefix + " updated");
+  await areas.submit();
+  assert.equal(areas.data.editingVersion, 2);
+  const [versionRows] = await db.execute(
+    "SELECT version FROM areas WHERE id=?",
+    [areaId],
+  );
+  assert.equal(versionRows[0].version, 2);
   const cats = page("admin/cats");
   cats.newDraft();
   await cats.load();
@@ -137,12 +156,18 @@ try {
       personality: "演示",
     },
   });
+  losePath = "/admin/cats";
+  await cats.submit();
+  assert.equal(cats.data.pending, true);
   await cats.submit();
   catId = cats.data.editingId;
   assert(catId, cats.data.message);
   const topics = page("admin/topics");
   topics.newDraft();
   topics.setData({ form: { name: prefix, status: "active" } });
+  losePath = "/admin/topics";
+  await topics.submit();
+  assert.equal(topics.data.pending, true);
   await topics.submit();
   topicId = topics.data.editingId;
   assert(topicId, topics.data.message);
@@ -217,7 +242,7 @@ try {
   await settings.save();
   assert.equal(settings.data.message, "资料已保存");
   assert.equal(storage.get("maochumo.session.v1").user.nickname, "ABC更新昵称");
-  await req(
+  const comment = await req(
     "/posts/" + postId + "/comments",
     "POST",
     { body: "新评论", replyToId: null, requestKey: randomUUID() },
@@ -241,9 +266,30 @@ try {
     "PASS B profile/session, own posts/likes, actual comment notification, focus route and idempotent read refresh",
   );
   login(1);
+  const reply = await req(
+    "/posts/" + postId + "/comments",
+    "POST",
+    { body: "管理员回复", replyToId: comment.id, requestKey: randomUUID() },
+    1,
+  );
+  login(0);
+  await messages.fetchList(true);
+  assert.equal(messages.data.unreadCount, 1);
+  const notice = messages.data.list.find((item) => item.commentId === reply.id);
+  assert.equal(notice?.type, "reply");
+  await messages.openPost({ currentTarget: { dataset: { id: notice.id } } });
+  assert(nav.at(-1).includes("commentId=" + reply.id));
+  await messages.fetchList(true);
+  assert.equal(messages.data.unreadCount, 0);
+  login(1);
   const moderation = page("admin/posts");
   moderation.requestKeyValue = randomUUID();
   moderation.setData({ selectedId: postId, reason: "自动化联调" });
+  losePath = "/admin/posts/" + postId + "/hide";
+  await moderation.confirm();
+  assert.equal(moderation.data.pending, true);
+  moderation.reasonInput({ detail: { value: "must not replace pending" } });
+  assert.equal(moderation.data.reason, "自动化联调");
   await moderation.confirm();
   assert.equal(moderation.data.selectedId, "", moderation.data.message);
   login(0);
@@ -256,6 +302,10 @@ try {
     currentTarget: { dataset: { id: messages.data.list[0].id } },
   });
   assert.equal(nav.length, 0);
+  const feed = await req("/posts");
+  assert(!feed.items.some((item) => item.id === postId));
+  const search = await req("/posts?q=" + encodeURIComponent(post.body));
+  assert(!search.items.some((item) => item.id === postId));
   await detail.loadPosts(true);
   assert.equal(detail.data.posts.length, 0);
   console.log(

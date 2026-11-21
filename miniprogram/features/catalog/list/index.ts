@@ -2,17 +2,19 @@ import type { Area, Cat } from "../../../../contracts/index";
 import { api } from "../../../core/api";
 import { errorMessage } from "../../../core/request";
 import { go } from "../../../core/routes";
+type CatRow = Cat & { caption: string };
 Page({
   data: {
     loading: false,
     viewState: "loading",
     viewMessage: "",
+    areaError: "",
     currentAreaName: "",
     q: "",
     areaId: "",
     areaList: [] as Area[],
     page: 0,
-    catList: [] as Cat[],
+    catList: [] as CatRow[],
     hasMore: false,
   },
   generation: 0,
@@ -26,9 +28,10 @@ Page({
   async fetchAreaList() {
     try {
       const res = await api.areas();
-      this.setData({ areaList: res.items });
+      this.setData({ areaList: res.items, areaError: "" });
+      this.setData({ catList: this.describeCats(this.data.catList) });
     } catch (e) {
-      this.setData({ viewMessage: errorMessage(e) });
+      this.setData({ areaError: errorMessage(e) });
     }
   },
   async fetchCatList(reset = false) {
@@ -44,7 +47,7 @@ Page({
       if (generation !== this.generation) return;
       const catList = reset ? res.items : [...this.data.catList, ...res.items];
       this.setData({
-        catList,
+        catList: this.describeCats(catList),
         page: res.page,
         hasMore: res.hasMore,
         viewState: catList.length ? "idle" : "empty",
@@ -56,6 +59,28 @@ Page({
     } finally {
       if (generation === this.generation) this.setData({ loading: false });
     }
+  },
+  describeCats(cats: Cat[]): CatRow[] {
+    return cats.map((cat) => ({
+      ...cat,
+      caption: [
+        this.data.areaList.find((a) => a.id === cat.areaId)?.name ||
+          "区域资料待完善",
+        cat.appearance || "外貌特征待完善",
+      ].join(" · "),
+    }));
+  },
+  chooseArea(e: WechatMiniprogram.TouchEvent) {
+    const areaId = e.currentTarget.dataset.id as string;
+    this.setData({
+      areaId,
+      currentAreaName:
+        this.data.areaList.find((a) => a.id === areaId)?.name || "",
+    });
+    void this.fetchCatList(true);
+  },
+  more() {
+    if (this.data.hasMore) void this.fetchCatList();
   },
   onSearchInput(e: WechatMiniprogram.Input) {
     this.setData({ q: e.detail.value });

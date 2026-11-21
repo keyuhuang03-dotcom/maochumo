@@ -1,3 +1,5 @@
+import { getSession } from "../../../core/session";
+import { pendingAdmin, submitAdmin, pendingMessage } from "../submission";
 import type { Area, CreateArea, UpdateArea } from "../../../../contracts/index";
 import { errorMessage, RequestError } from "../../../core/request";
 import { requestKey } from "../../../core/submission";
@@ -32,17 +34,26 @@ Page({
     editingId: "",
     editingVersion: 0,
     busy: false,
+    pending: false,
     message: "",
     conflict: false,
   },
   requestKeyValue: "",
   initialized: false,
+  actorId: "",
   onShow() {
+    const actorId = getSession()?.user.id || "";
+    if (actorId !== this.actorId) {
+      this.actorId = actorId;
+      this.initialized = false;
+      this.setData({ busy: false, pending: false });
+    }
     if (!isAdmin()) {
       this.setData({ admin: false, ready: true });
       return;
     }
     this.setData({ admin: true });
+    this.restorePending();
     if (!this.initialized) {
       this.initialized = true;
       this.newDraft();
@@ -52,7 +63,28 @@ Page({
   onUnload() {
     this.initialized = false;
   },
+  restorePending() {
+    const item = pendingAdmin<CreateArea | UpdateArea>("areas");
+    this.setData({ pending: !!item });
+    if (item) {
+      const input = item.input;
+      this.requestKeyValue = input.requestKey;
+      this.setData({
+        editingId: item.id,
+        editingVersion: "version" in input ? input.version : 0,
+        form: {
+          name: input.name,
+          x: String(input.region.x),
+          y: String(input.region.y),
+          width: String(input.region.width),
+          height: String(input.region.height),
+        },
+      });
+      this.setData({ message: pendingMessage });
+    }
+  },
   newDraft() {
+    if (this.data.busy || this.data.pending) return;
     this.requestKeyValue = requestKey();
     this.setData({
       editingId: "",
@@ -71,10 +103,12 @@ Page({
     }
   },
   fieldInput(e: WechatMiniprogram.Input) {
+    if (this.data.busy || this.data.pending) return;
     const field = e.currentTarget.dataset.field as keyof FormState;
     this.setData({ form: { ...this.data.form, [field]: e.detail.value } });
   },
   edit(e: WechatMiniprogram.TouchEvent) {
+    if (this.data.busy || this.data.pending) return;
     const area = this.data.areas.find(
       (a) => a.id === e.currentTarget.dataset.id,
     );
@@ -95,6 +129,7 @@ Page({
     });
   },
   async refreshCurrent() {
+    if (this.data.busy || this.data.pending) return;
     try {
       const result = await adminApi.areas();
       const area = result.items.find((a) => a.id === this.data.editingId);
@@ -150,16 +185,19 @@ Page({
         region: { x, y, width, height },
         requestKey: this.requestKeyValue,
       };
-      let saved: Area;
-      if (this.data.editingId) {
-        const payload: UpdateArea = {
-          ...base,
-          version: this.data.editingVersion,
-        };
-        saved = await adminApi.updateArea(this.data.editingId, payload);
-      } else {
-        saved = await adminApi.createArea(base);
-      }
+      const input: CreateArea | UpdateArea = this.data.editingId
+        ? { ...base, version: this.data.editingVersion }
+        : base;
+      const saved = await submitAdmin(
+        "areas",
+        this.data.editingId,
+        input,
+        (id, payload) =>
+          id
+            ? adminApi.updateArea(id, payload as UpdateArea)
+            : adminApi.createArea(payload),
+      );
+      this.setData({ pending: false });
       this.requestKeyValue = requestKey();
       this.setData({
         editingId: saved.id,
@@ -176,6 +214,9 @@ Page({
       });
       await this.load();
     } catch (e) {
+      const pending = !!pendingAdmin("areas");
+      this.setData({ pending });
+      if (!pending) this.requestKeyValue = requestKey();
       const conflict =
         e instanceof RequestError && e.code === "VERSION_CONFLICT";
       this.setData({
@@ -183,7 +224,9 @@ Page({
         conflict,
         message: conflict
           ? "该区域已被其他人修改，请载入最新版本后重试"
-          : errorMessage(e),
+          : pending
+            ? pendingMessage
+            : errorMessage(e),
       });
     }
   },
