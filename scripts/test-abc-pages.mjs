@@ -242,7 +242,7 @@ try {
   await settings.save();
   assert.equal(settings.data.message, "资料已保存");
   assert.equal(storage.get("maochumo.session.v1").user.nickname, "ABC更新昵称");
-  await req(
+  const comment = await req(
     "/posts/" + postId + "/comments",
     "POST",
     { body: "新评论", replyToId: null, requestKey: randomUUID() },
@@ -266,6 +266,22 @@ try {
     "PASS B profile/session, own posts/likes, actual comment notification, focus route and idempotent read refresh",
   );
   login(1);
+  const reply = await req(
+    "/posts/" + postId + "/comments",
+    "POST",
+    { body: "管理员回复", replyToId: comment.id, requestKey: randomUUID() },
+    1,
+  );
+  login(0);
+  await messages.fetchList(true);
+  assert.equal(messages.data.unreadCount, 1);
+  const notice = messages.data.list.find((item) => item.commentId === reply.id);
+  assert.equal(notice?.type, "reply");
+  await messages.openPost({ currentTarget: { dataset: { id: notice.id } } });
+  assert(nav.at(-1).includes("commentId=" + reply.id));
+  await messages.fetchList(true);
+  assert.equal(messages.data.unreadCount, 0);
+  login(1);
   const moderation = page("admin/posts");
   moderation.requestKeyValue = randomUUID();
   moderation.setData({ selectedId: postId, reason: "自动化联调" });
@@ -286,6 +302,10 @@ try {
     currentTarget: { dataset: { id: messages.data.list[0].id } },
   });
   assert.equal(nav.length, 0);
+  const feed = await req("/posts");
+  assert(!feed.items.some((item) => item.id === postId));
+  const search = await req("/posts?q=" + encodeURIComponent(post.body));
+  assert(!search.items.some((item) => item.id === postId));
   await detail.loadPosts(true);
   assert.equal(detail.data.posts.length, 0);
   console.log(

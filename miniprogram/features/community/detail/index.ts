@@ -13,7 +13,7 @@ Page({
     message: "",
     postId: "",
     commentId: "",
-    comments: [] as Comment[],
+    comments: [] as (Comment & { timeLabel: string })[],
     commentPage: 0,
     commentMore: false,
     commentState: "idle",
@@ -127,10 +127,20 @@ Page({
         focusId,
       );
       if (!current()) return;
+      const items = result.items.map((comment) => {
+        const date = new Date(comment.createdAt);
+        const time = [date.getHours(), date.getMinutes()]
+          .map((part) => String(part).padStart(2, "0"))
+          .join(":");
+        return {
+          ...comment,
+          timeLabel: Number.isNaN(date.getTime())
+            ? ""
+            : `${date.getMonth() + 1}月${date.getDate()}日 ${time}`,
+        };
+      });
       this.setData({
-        comments: append
-          ? this.data.comments.concat(result.items)
-          : result.items,
+        comments: append ? this.data.comments.concat(items) : items,
         commentPage: result.page,
         commentMore: result.hasMore,
         commentState: result.items.length ? "ready" : "empty",

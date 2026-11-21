@@ -11,7 +11,9 @@
   display: flex;
   align-items: center;
   gap: 10rpx;
-  margin: 0;
+  margin: 0 !important;
+  padding: 16rpx 24rpx;
+  border-radius: 24rpx;
   min-width: 156rpx;
   font-weight: 600;
 }
@@ -19,13 +21,14 @@
   background: transparent;
   color: #737c6d;
   font-size: 25rpx;
-  margin: 0;
+  margin: 0 0 0 auto !important;
+  text-align: right;
 }
 .comment {
   padding: 22rpx 0 26rpx;
 }
 .comment-author {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #737c6d;
 }
 .comment-body {
@@ -41,7 +44,7 @@
 }
 .reply-button {
   display: inline-block;
-  min-height: 56rpx;
+  min-height: 52rpx;
   margin: 0;
   padding: 10rpx 20rpx;
   font-size: 24rpx;
@@ -72,6 +75,8 @@
   min-height: 54rpx;
   max-height: 190rpx;
   flex: 1;
+  width: 0;
+  min-width: 0;
   line-height: 1.5;
   border-radius: 0;
   font-size: 28rpx;
@@ -104,7 +109,10 @@
   width: auto;
 }
 button.send-button {
-  width: 136rpx !important;
+  width: 152rpx !important;
+  min-width: 152rpx;
+  border-radius: 24rpx;
+  flex-shrink: 0;
 }
 .like-button {
   width: 156rpx !important;
@@ -116,8 +124,16 @@ button.send-button {
   min-width: 0;
 }
 .reply-button {
-  width: 120rpx !important;
+  width: 114rpx !important;
 }
 .delete-button {
-  width: 80rpx !important;
+  width: 112rpx !important;
+  padding: 14rpx 20rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.like-button.is-liked {
+  background: #587649;
+  color: #fff;
 }
